@@ -32,6 +32,8 @@ import com.lixin.listen.util.MediaPlayerUtil;
 import com.lixin.listen.util.PlayAudioManager;
 import com.lixin.listen.util.Player;
 import com.lixin.listen.util.PrefsUtil;
+import com.lixin.listen.util.ProgressDialog;
+import com.lixin.listen.util.abLog;
 import com.lixin.listen.widget.recyclerview.CommonAdapter;
 import com.lixin.listen.widget.recyclerview.MultiItemTypeAdapter;
 import com.lixin.listen.widget.recyclerview.ViewHolder;
@@ -249,6 +251,7 @@ public class ServerFileFragment extends Fragment {
      * @param albumId
      */
     private void doDeleteQuzi(String albumId) {
+        ProgressDialog.showProgressDialog(getActivity(), null);
         RequestVO vo = new RequestVO();
         vo.setCmd("deleteMusic");
         vo.setUid(PrefsUtil.getString(getActivity(), "userid", ""));
@@ -263,6 +266,7 @@ public class ServerFileFragment extends Fragment {
                     public void onError(Call call, Exception e, int id) {
                         Toast.makeText(getActivity(), "服务器异常,请稍后重试", Toast.LENGTH_SHORT).show();
                         e.printStackTrace();
+                        ProgressDialog.dismissDialog();
                     }
 
                     @Override
@@ -272,6 +276,7 @@ public class ServerFileFragment extends Fragment {
                         PrefsUtil.putString(getActivity(), "@" + vo.getLocalId().substring(vo.getLocalId().indexOf("_"))
                                 , "upload");
                         loadData();
+                        ProgressDialog.dismissDialog();
                     }
 
                 });
@@ -281,6 +286,7 @@ public class ServerFileFragment extends Fragment {
      * 获取专辑下的曲子
      */
     private void doSelectQuzi(String quziId) {
+        ProgressDialog.showProgressDialog(getActivity(), null);
         RequestVO vo = new RequestVO();
         vo.setCmd("getAlbumList");
         vo.setThirdTypeId(quziId);
@@ -295,12 +301,14 @@ public class ServerFileFragment extends Fragment {
                     public void onError(Call call, Exception e, int id) {
                         Toast.makeText(getActivity(), "服务器异常,请稍后重试", Toast.LENGTH_SHORT).show();
                         e.printStackTrace();
+                        ProgressDialog.dismissDialog();
                     }
 
                     @Override
                     public void onResponse(String response, int id) {
                         ZhuanjiQuziVO vo = new Gson().fromJson(response, ZhuanjiQuziVO.class);
                         updateQuzi(vo);
+                        ProgressDialog.dismissDialog();
                     }
 
                 });
@@ -316,6 +324,7 @@ public class ServerFileFragment extends Fragment {
      * 获取我的专辑
      */
     private void loadData() {
+        ProgressDialog.showProgressDialog(getActivity(), null);
         RequestVO vo = new RequestVO();
         vo.setCmd("getAlbum");
         vo.setUid(PrefsUtil.getString(getActivity(), "userid", ""));
@@ -329,12 +338,15 @@ public class ServerFileFragment extends Fragment {
                     public void onError(Call call, Exception e, int id) {
                         Toast.makeText(getActivity(), "服务器异常,请稍后重试", Toast.LENGTH_SHORT).show();
                         e.printStackTrace();
+                        ProgressDialog.dismissDialog();
                     }
 
                     @Override
                     public void onResponse(String response, int id) {
+                        abLog.e("我的专辑.............", response);
                         MyZhuanjiVo vo = new Gson().fromJson(response, MyZhuanjiVo.class);
                         updateMyzhuanji(vo);
+                        ProgressDialog.dismissDialog();
                     }
 
                 });
@@ -343,8 +355,10 @@ public class ServerFileFragment extends Fragment {
     // 设置我的专辑
     private void updateMyzhuanji(MyZhuanjiVo vo) {
         zhuanjiList.clear();
+        zhuanjiAdapter.notifyDataSetChanged();
         zhuanjiList.addAll(vo.getAlbumList());
-
+        quziList.clear();
+        quziAdapter.notifyDataSetChanged();
         if (vo.getAlbumList().size() > 0) {
             vo.getAlbumList().get(0).setSelect(true);
             doSelectQuzi(vo.getAlbumList().get(0).getAlbumId());

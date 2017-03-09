@@ -55,7 +55,7 @@ public class OperatingDlg {
         });
 
         webView = (WebView) view.findViewById(R.id.webview);
-//        getOperating();
+        getOperating();
 
         Window dialogWindow = builder.getWindow();
         dialogWindow.setGravity(Gravity.CENTER);//显示在底部
@@ -69,33 +69,33 @@ public class OperatingDlg {
 
     }
 
-//    private void getOperating() {
-//        com.lixin.listen.util.ProgressDialog.showProgressDialog(context, null);
-//        String json = "{\"cmd\":\"getExplain\"" + "}";
-//        OkHttpUtils.post().url(Constant.URL).addParams("json", json).build().execute(new StringCallback() {
-//            @Override
-//            public void onError(Call call, Exception e, int id) {
-//                com.lixin.listen.util.ProgressDialog.dismissDialog();
-//                ToastUtil.showToast("网路错误，获取操作说明失败");
-//            }
-//
-//            @Override
-//            public void onResponse(String response, int id) {
-//                com.lixin.listen.util.ProgressDialog.dismissDialog();
-//                try {
-//                    JSONObject obj = new JSONObject(response);
-//                    if (obj.getString("result").equals("0")) {
-//                        webView.loadUrl(obj.getString("newAboutMe"));
-//                    } else {
-//                        ToastUtil.showToast(obj.getString("resultNote") + "，获取操作说明失败");
-//                    }
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
-//
-//    }
+    private void getOperating() {
+        com.lixin.listen.util.ProgressDialog.showProgressDialog(context, null);
+        String json = "{\"cmd\":\"getExplain\"" + "}";
+        OkHttpUtils.post().url(Constant.URL).addParams("json", json).build().execute(new StringCallback() {
+            @Override
+            public void onError(Call call, Exception e, int id) {
+                com.lixin.listen.util.ProgressDialog.dismissDialog();
+                ToastUtil.showToast("网路错误，获取操作说明失败");
+            }
+
+            @Override
+            public void onResponse(String response, int id) {
+                com.lixin.listen.util.ProgressDialog.dismissDialog();
+                try {
+                    JSONObject obj = new JSONObject(response);
+                    if (obj.getString("result").equals("0")) {
+                        webView.loadUrl(obj.getString("newAboutMe"));
+                    } else {
+                        ToastUtil.showToast(obj.getString("resultNote") + "，获取操作说明失败");
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+    }
 
 
     public void disDialog() {

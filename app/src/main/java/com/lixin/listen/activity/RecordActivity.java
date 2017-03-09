@@ -5,13 +5,11 @@ import android.graphics.Typeface;
 import android.graphics.drawable.AnimationDrawable;
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -21,7 +19,6 @@ import android.widget.Toast;
 import com.czp.library.ArcProgress;
 import com.google.gson.Gson;
 import com.lixin.listen.R;
-import com.lixin.listen.bean.MusicBean;
 import com.lixin.listen.bean.RecordSuccessVO;
 import com.lixin.listen.bean.RequestVO;
 import com.lixin.listen.bean.StartRecordVo;
@@ -34,6 +31,7 @@ import com.lixin.listen.util.DirTraversal;
 import com.lixin.listen.util.MediaRecorderUtil;
 import com.lixin.listen.util.PrefsUtil;
 import com.lixin.listen.util.RealPathMediaRecordUtil;
+import com.lixin.listen.view.ClickImageView;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
@@ -51,7 +49,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import okhttp3.Call;
 
-public class RecordActivity extends AppCompatActivity {
+
+public class RecordActivity extends AppCompatActivity implements ClickImageView.ClickImageViewCallBack{
 
     @Bind(R.id.iv_back)
     ImageView ivBack;
@@ -65,8 +64,7 @@ public class RecordActivity extends AppCompatActivity {
     ArcProgress myProgress01;
     @Bind(R.id.rl_record)
     RelativeLayout rlRecord;
-    @Bind(R.id.btn_stop)
-    Button btnStop;
+
     @Bind(R.id.tv_fenbei)
     TextView tvFenbei;
     @Bind(R.id.tv_shijian)
@@ -79,6 +77,8 @@ public class RecordActivity extends AppCompatActivity {
     ImageView ivMid;
     @Bind(R.id.iv_high)
     ImageView ivHigh;
+
+    ClickImageView btnStop;
 
     private Timer mTimer;
     private Timer mTimer1;
@@ -109,6 +109,8 @@ public class RecordActivity extends AppCompatActivity {
         BusProvider.getInstance().register(this);
         getParams();
         initViews();
+        btnStop= (ClickImageView) findViewById(R.id.btn_stop);
+        btnStop.setClickImageViewCallBack(this);
         // 开始录音-记录临时文件
         tempMediarecorder();
 
@@ -410,45 +412,6 @@ public class RecordActivity extends AppCompatActivity {
         tvTime.setTypeface(tf);
     }
 
-    @OnClick(R.id.btn_stop)
-    public void Stop() {
-        if (RealPathMediaRecordUtil.realRecord != null) {
-            RealPathMediaRecordUtil.stopRecordering();
-        }
-        MediaRecorderUtil.stopRecordering();
-        mTimer.cancel();
-
-        // 获取录制目录下的所有文件
-        final List<File> files = DirTraversal.listFiles(AppHelper.getInnerFilePath(RecordActivity.this).getAbsolutePath() + File.separator
-                + getPackageName());
-        for (int i = 0; i < files.size(); i++) {
-
-            final File file = files.get(i);
-            MediaPlayer mp = new MediaPlayer();
-            try {
-                mp.setDataSource(files.get(i).getAbsolutePath());
-                mp.prepare();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            mp.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-
-                @Override
-                public void onPrepared(MediaPlayer mp) {
-                    int size = mp.getDuration();
-                    int timelong = size / 1000;
-                    if (timelong < 6) {
-                        file.delete();
-                    }
-                }
-            });
-        }
-
-        doFinishRecord();
-
-    }
-
     private void doFinishRecord() {
 
         AllFileTiem = AllFileTiem - 1;
@@ -600,5 +563,43 @@ public class RecordActivity extends AppCompatActivity {
         super.onDestroy();
         mTimer.cancel();
         BusProvider.getInstance().unregister(this);
+    }
+
+    @Override
+    public void clickImage() {
+        if (RealPathMediaRecordUtil.realRecord != null) {
+            RealPathMediaRecordUtil.stopRecordering();
+        }
+        MediaRecorderUtil.stopRecordering();
+        mTimer.cancel();
+
+        // 获取录制目录下的所有文件
+        final List<File> files = DirTraversal.listFiles(AppHelper.getInnerFilePath(RecordActivity.this).getAbsolutePath() + File.separator
+                + getPackageName());
+        for (int i = 0; i < files.size(); i++) {
+
+            final File file = files.get(i);
+            MediaPlayer mp = new MediaPlayer();
+            try {
+                mp.setDataSource(files.get(i).getAbsolutePath());
+                mp.prepare();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            mp.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+
+                @Override
+                public void onPrepared(MediaPlayer mp) {
+                    int size = mp.getDuration();
+                    int timelong = size / 1000;
+                    if (timelong < 6) {
+                        file.delete();
+                    }
+                }
+            });
+        }
+
+        doFinishRecord();
     }
 }

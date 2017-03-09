@@ -169,6 +169,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         BusProvider.getInstance().unregister(this);
+        operatingDlg.disDialog();
     }
 
     @OnClick(R.id.iv_info)

@@ -1,5 +1,6 @@
 package com.lixin.listen.util;
 
+import android.annotation.TargetApi;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -68,45 +69,47 @@ public class UpdateManager {
         mContext = context;
     }
 
-    private Handler mGetVersionHandler = new Handler(){
+    private Handler mGetVersionHandler = new Handler() {
         public void handleMessage(Message msg) {
             UpdateVO jsonObject = (UpdateVO) msg.obj;
             System.out.println(jsonObject.toString());
-            Log.e("----------",jsonObject.toString());
+            Log.e("----------", jsonObject.toString());
             try {
                 mVersion_code = jsonObject.getVersionNumber();
                 //mVersion_name = jsonObject.getString("version_name");
                 //mVersion_desc = jsonObject.getString("version_desc");
                 mVersion_path = jsonObject.getUpdataAddress();
 
-                Log.e("version ",mVersion_code);
-                Log.e("downurl ",mVersion_path);
+                Log.e("version ", mVersion_code);
+                Log.e("downurl ", mVersion_path);
 
-                if (isUpdate()){
+                if (isUpdate()) {
                     //Toast.makeText(mContext, "需要更新", Toast.LENGTH_SHORT).show();
                     // 显示提示更新对话框
                     showNoticeDialog();
-                } else{
+                } else {
                     Toast.makeText(mContext, "已是最新版本", Toast.LENGTH_SHORT).show();
 
                 }
 
-            } catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
-        };
+        }
+
+        ;
     };
 
-    private Handler mUpdateProgressHandler = new Handler(){
+    private Handler mUpdateProgressHandler = new Handler() {
         public void handleMessage(Message msg) {
-            switch (msg.what){
+            switch (msg.what) {
                 case DOWNLOADING:
                     // 设置进度条
                     mProgressBar.setProgress(mProgress);
-                    tv1.setText( mProgress + "/100");
-                    float len = length/1024/1024;//将length转换为M单位
-                    float b = (float)(Math.round(len*100))/100;//保留两位小数点
-                    tv2.setText( b+"M");
+                    tv1.setText(mProgress + "/100");
+                    float len = length / 1024 / 1024;//将length转换为M单位
+                    float b = (float) (Math.round(len * 100)) / 100;//保留两位小数点
+                    tv2.setText(b + "M");
                     break;
                 case DOWNLOAD_FINISH:
                     // 隐藏当前下载对话框
@@ -117,15 +120,16 @@ public class UpdateManager {
                 default:
                     break;
             }
-        };
+        }
+
+        ;
     };
 
     /*
      * 检测软件是否需要更新
      */
-    public void checkUpdate() {
-
-
+    public void checkUpdate(Context context) {
+        ProgressDialog.showProgressDialog(context, "检测中...");
         String url = Constant.URL + "json=" + new Gson().toJson(new RequestVO("getVersion"));
         OkHttpUtils
                 .get()
@@ -136,6 +140,7 @@ public class UpdateManager {
                     public void onError(Call call, Exception e, int id) {
                         e.printStackTrace();
                         Toast.makeText(mContext, "服务器异常,请稍后重试", Toast.LENGTH_SHORT).show();
+                        ProgressDialog.dismissDialog();
                     }
 
                     @Override
@@ -152,6 +157,7 @@ public class UpdateManager {
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
+                        ProgressDialog.dismissDialog();
                     }
 
                 });
@@ -251,8 +257,8 @@ public class UpdateManager {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                try{//检查sd是否挂载
-                    if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
+                try {//检查sd是否挂载
+                    if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
                         String sdPath = AppHelper.getInnerFilePath(mContext) + "/";
                         mSavePath = sdPath + "MyDownload";
 
@@ -269,16 +275,16 @@ public class UpdateManager {
 
                         int count = 0;
                         byte[] buffer = new byte[1024];
-                        while (!mIsCancel){
+                        while (!mIsCancel) {
                             int numread = is.read(buffer);
                             count += numread;
                             // 计算进度条的当前位置
-                            mProgress = (int) ((count/length) * 100);
+                            mProgress = (int) ((count / length) * 100);
                             // 更新进度条
                             mUpdateProgressHandler.sendEmptyMessage(DOWNLOADING);
 
                             // 下载完成
-                            if (numread < 0){
+                            if (numread < 0) {
                                 mUpdateProgressHandler.sendEmptyMessage(DOWNLOAD_FINISH);
                                 break;
                             }
@@ -287,7 +293,7 @@ public class UpdateManager {
                         fos.close();
                         is.close();
                     }
-                }catch(Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }

@@ -26,6 +26,9 @@ import com.lixin.listen.common.Constant;
 import com.lixin.listen.util.MaxLengthWatcher;
 import com.lixin.listen.util.MediaPlayerUtil;
 import com.lixin.listen.util.PrefsUtil;
+import com.lixin.listen.view.ClickButton;
+import com.lixin.listen.view.ClickImageView;
+import com.lixin.listen.view.ClickImageView.ClickImageViewCallBack;
 
 import java.io.File;
 
@@ -33,10 +36,12 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static com.lixin.listen.R.id.iv_tuijianzhuanji;
+
 /**
  * 归类本地文件
  */
-public class GuileiLocalFileActivity extends AppCompatActivity {
+public class GuileiLocalFileActivity extends AppCompatActivity implements ClickImageViewCallBack,ClickButton.ClickButtonCallBack{
 
     @Bind(R.id.iv_back)
     ImageView ivBack;
@@ -70,10 +75,7 @@ public class GuileiLocalFileActivity extends AppCompatActivity {
     EditText etName;
     @Bind(R.id.tv_zhuanji)
     TextView tvZhuanji;
-    @Bind(R.id.iv_tuijianzhuanji)
-    ImageView ivTuijianzhuanji;
-    @Bind(R.id.btn_save)
-    Button btnSave;
+
     @Bind(R.id.iv_shadow)
     ImageView ivShadow;
     @Bind(R.id.tv_all_time)
@@ -93,6 +95,9 @@ public class GuileiLocalFileActivity extends AppCompatActivity {
     private String secondTypeId = "";
     private String thirdTypeId = "";
 
+    ClickImageView ivTuijianzhuanji;
+    ClickButton btnSave;
+
     // 专辑名称
     String zhuanjiName;
     // 曲子名称
@@ -105,6 +110,10 @@ public class GuileiLocalFileActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         getParams();
         initViews();
+        ivTuijianzhuanji= (ClickImageView) findViewById(R.id.iv_tuijianzhuanji);
+        ivTuijianzhuanji.setClickImageViewCallBack(this);
+        btnSave= (ClickButton) findViewById(R.id.btn_save);
+        btnSave.setClickButtonCallBack(this);
 
     }
 
@@ -141,12 +150,12 @@ public class GuileiLocalFileActivity extends AppCompatActivity {
         etName.addTextChangedListener(new MaxLengthWatcher(12, etName, new IEditMaxLenth() {
             @Override
             public void maxLenth() {
-                Toast.makeText(GuileiLocalFileActivity.this , "最多只能输入12个字符", Toast.LENGTH_SHORT).show();
+                Toast.makeText(GuileiLocalFileActivity.this, "最多只能输入12个字符", Toast.LENGTH_SHORT).show();
             }
         }));
     }
 
-    @OnClick({R.id.iv_tuijianzhuanji, R.id.tv_zhuanji})
+    @OnClick({iv_tuijianzhuanji, R.id.tv_zhuanji})
     public void toTuijian() {
         Intent intent = new Intent(GuileiLocalFileActivity.this, ChooseZhuanjiActivity.class);
         startActivityForResult(intent, 1001);
@@ -164,76 +173,6 @@ public class GuileiLocalFileActivity extends AppCompatActivity {
         }
     }
 
-    @OnClick(R.id.btn_save)
-    public void doSave() {
-        if (TextUtils.isEmpty(etName.getText().toString())) {
-            Toast.makeText(this, "请先填写曲子的名称", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        if (TextUtils.isEmpty(tvZhuanji.getText().toString())) {
-            Toast.makeText(this, "请先选择专辑", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        File file = new File(musicBean.getFilePath());
-        String filePath = musicBean.getFilePath();
-        // 未归类文件
-        if (filePath.contains("weiguilei")){
-            filePath = filePath.replace("weiguilei_", "$" + tvZhuanji.getText() + "#" + etName.getText() + "%");
-        }
-        // 已归类文件
-        else {
-            filePath = filePath.replace( quziName, etName.getText().toString().trim());
-            filePath = filePath.replace( zhuanjiName, tvZhuanji.getText().toString());
-        }
-
-        file.renameTo(new File(filePath));
-
-        final String finalFilePath = filePath;
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Intent intent = new Intent();
-                intent.putExtra("firstTypeId", firstTypeId);
-                intent.putExtra("secondTypeId", secondTypeId);
-                intent.putExtra("thirdTypeId", thirdTypeId);
-                intent.putExtra("albumName", etName.getText().toString());
-                intent.putExtra("fileTime", finalFilePath.substring(finalFilePath.indexOf("_") + 1, finalFilePath.indexOf("_") + 14));
-                PrefsUtil.putString(GuileiLocalFileActivity.this, finalFilePath.substring(finalFilePath.indexOf("_") + 1, finalFilePath.indexOf("_") + 14), firstTypeId +
-                        "," + secondTypeId + "," + thirdTypeId + "," + etName.getText().toString());
-                // 保存一级目录
-                if (TextUtils.isEmpty(PrefsUtil.getString(GuileiLocalFileActivity.this, Constant.FIRST_ROOT, ""))){
-                    PrefsUtil.putString(GuileiLocalFileActivity.this, Constant.FIRST_ROOT, firstTypeId);
-                }
-                else {
-                    String firstRoot = PrefsUtil.getString(GuileiLocalFileActivity.this, Constant.FIRST_ROOT, "");
-                    PrefsUtil.putString(GuileiLocalFileActivity.this, Constant.FIRST_ROOT, firstTypeId + "," +
-                            firstRoot
-                    );
-                }
-                // 保存二级目录
-                if (TextUtils.isEmpty(PrefsUtil.getString(GuileiLocalFileActivity.this, Constant.SECOND_ROOT, ""))) {
-                    PrefsUtil.putString(GuileiLocalFileActivity.this, Constant.SECOND_ROOT, secondTypeId);
-                }
-                else {
-                    String sencondRoot = PrefsUtil.getString(GuileiLocalFileActivity.this, Constant.SECOND_ROOT, "");
-                    PrefsUtil.putString(GuileiLocalFileActivity.this, Constant.SECOND_ROOT, secondTypeId + "," + sencondRoot );
-                }
-                // 保存三级目录
-                if (TextUtils.isEmpty(PrefsUtil.getString(GuileiLocalFileActivity.this, Constant.THIRD_ROOT, ""))){
-                    PrefsUtil.putString(GuileiLocalFileActivity.this, Constant.THIRD_ROOT, thirdTypeId);
-                }
-                else {
-                    String thirdRoot = PrefsUtil.getString(GuileiLocalFileActivity.this, Constant.THIRD_ROOT, "");
-                    PrefsUtil.putString(GuileiLocalFileActivity.this, Constant.THIRD_ROOT, thirdTypeId + "," + thirdRoot);
-                }
-
-                setResult(RESULT_OK, intent);
-                finish();
-            }
-        }, 1000);
-
-    }
 
     /**
      * 播放语音
@@ -290,5 +229,79 @@ public class GuileiLocalFileActivity extends AppCompatActivity {
 
         return fileTime;
     }
+
+    @Override
+    public void clickImage() {
+        Intent intent = new Intent(GuileiLocalFileActivity.this, ChooseZhuanjiActivity.class);
+        startActivityForResult(intent, 1001);
+    }
+
+    @Override
+    public void clickButton() {
+        if (TextUtils.isEmpty(etName.getText().toString())) {
+            Toast.makeText(this, "请先填写曲子的名称", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (TextUtils.isEmpty(tvZhuanji.getText().toString())) {
+            Toast.makeText(this, "请先选择专辑", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        File file = new File(musicBean.getFilePath());
+        String filePath = musicBean.getFilePath();
+        // 未归类文件
+        if (filePath.contains("weiguilei")) {
+            filePath = filePath.replace("weiguilei_", "$" + tvZhuanji.getText() + "#" + etName.getText() + "%");
+        }
+        // 已归类文件
+        else {
+            filePath = filePath.replace(quziName, etName.getText().toString().trim());
+            filePath = filePath.replace(zhuanjiName, tvZhuanji.getText().toString());
+        }
+
+        file.renameTo(new File(filePath));
+
+        final String finalFilePath = filePath;
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Intent intent = new Intent();
+                intent.putExtra("firstTypeId", firstTypeId);
+                intent.putExtra("secondTypeId", secondTypeId);
+                intent.putExtra("thirdTypeId", thirdTypeId);
+                intent.putExtra("albumName", etName.getText().toString());
+                intent.putExtra("fileTime", finalFilePath.substring(finalFilePath.indexOf("_") + 1, finalFilePath.indexOf("_") + 14));
+                PrefsUtil.putString(GuileiLocalFileActivity.this, finalFilePath.substring(finalFilePath.indexOf("_") + 1, finalFilePath.indexOf("_") + 14), firstTypeId +
+                        "," + secondTypeId + "," + thirdTypeId + "," + etName.getText().toString());
+                // 保存一级目录
+                if (TextUtils.isEmpty(PrefsUtil.getString(GuileiLocalFileActivity.this, Constant.FIRST_ROOT, ""))) {
+                    PrefsUtil.putString(GuileiLocalFileActivity.this, Constant.FIRST_ROOT, firstTypeId);
+                } else {
+                    String firstRoot = PrefsUtil.getString(GuileiLocalFileActivity.this, Constant.FIRST_ROOT, "");
+                    PrefsUtil.putString(GuileiLocalFileActivity.this, Constant.FIRST_ROOT, firstTypeId + "," +
+                            firstRoot
+                    );
+                }
+                // 保存二级目录
+                if (TextUtils.isEmpty(PrefsUtil.getString(GuileiLocalFileActivity.this, Constant.SECOND_ROOT, ""))) {
+                    PrefsUtil.putString(GuileiLocalFileActivity.this, Constant.SECOND_ROOT, secondTypeId);
+                } else {
+                    String sencondRoot = PrefsUtil.getString(GuileiLocalFileActivity.this, Constant.SECOND_ROOT, "");
+                    PrefsUtil.putString(GuileiLocalFileActivity.this, Constant.SECOND_ROOT, secondTypeId + "," + sencondRoot);
+                }
+                // 保存三级目录
+                if (TextUtils.isEmpty(PrefsUtil.getString(GuileiLocalFileActivity.this, Constant.THIRD_ROOT, ""))) {
+                    PrefsUtil.putString(GuileiLocalFileActivity.this, Constant.THIRD_ROOT, thirdTypeId);
+                } else {
+                    String thirdRoot = PrefsUtil.getString(GuileiLocalFileActivity.this, Constant.THIRD_ROOT, "");
+                    PrefsUtil.putString(GuileiLocalFileActivity.this, Constant.THIRD_ROOT, thirdTypeId + "," + thirdRoot);
+                }
+
+                setResult(RESULT_OK, intent);
+                finish();
+            }
+        }, 1000);
+    }
+
 }
 

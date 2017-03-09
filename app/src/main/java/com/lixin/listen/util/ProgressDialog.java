@@ -26,20 +26,6 @@ public class ProgressDialog {
         }
     }
 
-//    /**
-//     * 显示进度对话框
-//     *
-//     * @param msg 提示文本
-//     */
-//    public static void showProgressDialog(Context context, String msg) {
-//        if(progressDlg!=null){
-//            if(progressDlg.isShowing()){
-//                return;
-//            }
-//        }
-//        progressDlg = ProgressDialog.createLoadingDialog(context, msg);
-//        progressDlg.show();
-//    }
 
     public static void showProgressDialog(Context context, String msg) {
         if (proDialog == null) {

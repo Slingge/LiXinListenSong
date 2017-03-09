@@ -18,111 +18,6 @@
         <include layout="@layout/item_music"></include>
     </LinearLayout>
 
-    <!--<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_margin="10dp"-->
-    <!--android:layout_height="130dp"-->
-    <!--android:background="@mipmap/img_music_all"-->
-    <!--android:orientation="vertical">-->
-
-    <!--<RelativeLayout-->
-    <!--android:id="@+id/rl_shang"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:paddingRight="10dp"-->
-    <!--&gt;-->
-
-    <!--<RelativeLayout-->
-    <!--android:id="@+id/rl_play"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content">-->
-
-    <!--<ImageView-->
-    <!--android:id="@+id/iv_play"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:padding="15dp"-->
-    <!--android:src="@mipmap/img_play" />-->
-
-    <!--<ImageView-->
-    <!--android:id="@+id/iv_pause"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:padding="15dp"-->
-    <!--android:src="@mipmap/img_pause"-->
-    <!--android:visibility="gone"/>-->
-
-    <!--</RelativeLayout>-->
-
-    <!--<TextView-->
-    <!--android:id="@+id/tv_name"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_marginTop="15dp"-->
-    <!--android:layout_marginLeft="10dp"-->
-    <!--android:textSize="20sp"-->
-    <!--android:textColor="@color/windowBackground"-->
-    <!--android:layout_toRightOf="@+id/rl_play"-->
-    <!--android:text="未命名" />-->
-
-    <!--<TextView-->
-    <!--android:id="@+id/tv_time"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_alignParentRight="true"-->
-    <!--android:layout_marginRight="10dp"-->
-    <!--android:layout_below="@+id/tv_name"-->
-    <!--android:textColor="@color/windowBackground"-->
-    <!--android:text="00:00/00:30"-->
-    <!--android:textSize="14sp"/>-->
-
-    <!--<SeekBar-->
-    <!--android:id="@+id/sb"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_alignParentRight="true"-->
-    <!--android:layout_toRightOf="@+id/rl_play"-->
-    <!--style="@style/Widget.SeekBar.Normal"-->
-    <!--android:layout_below="@+id/tv_time"-->
-    <!--android:layout_alignParentEnd="true" />-->
-    <!--</RelativeLayout>-->
-
-
-    <!--<RelativeLayout-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_below="@+id/rl_shang"-->
-    <!--android:layout_alignParentBottom="true"-->
-    <!--android:gravity="bottom"-->
-    <!--android:paddingRight="10dp"-->
-    <!--android:paddingBottom="13sp">-->
-
-    <!--<ImageView-->
-    <!--android:id="@+id/iv_delete"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_alignParentRight="true"-->
-    <!--android:src="@mipmap/img_delete" />-->
-
-    <!--<ImageView-->
-    <!--android:id="@+id/iv_upload"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_marginRight="10dp"-->
-    <!--android:layout_toLeftOf="@+id/iv_delete"-->
-    <!--android:src="@mipmap/img_upload" />-->
-
-    <!--<ImageView-->
-    <!--android:id="@+id/iv_weilei"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_marginRight="10dp"-->
-    <!--android:layout_toLeftOf="@+id/iv_upload"-->
-    <!--android:src="@mipmap/img_guileizhuanji" />-->
-    <!--</RelativeLayout>-->
-
-    <!--</RelativeLayout>-->
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -193,7 +88,7 @@
         android:layout_marginTop="15dp"
         android:paddingRight="10dp">
 
-        <ImageView
+        <com.lixin.listen.view.ClickImageView
             android:id="@+id/iv_tuijianzhuanji"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -202,7 +97,7 @@
 
     </RelativeLayout>
 
-    <Button
+    <com.lixin.listen.view.ClickButton
         android:id="@+id/btn_save"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

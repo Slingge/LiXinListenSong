@@ -1,54 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/image_cancel"
-        android:layout_marginLeft="10dp"
-        android:layout_toLeftOf="@+id/image_cancel"
-        android:background="@drawable/operating_instructions"
-        android:orientation="vertical">
-
-        <FrameLayout
+        android:layout_height="wrap_content">
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent"
+            android:layout_below="@+id/image_cancel"
+            android:layout_marginLeft="10dp"
+            android:layout_toLeftOf="@+id/image_cancel"
+            android:background="@drawable/operating_instructions"
+            android:orientation="vertical">
 
-            <ImageView
-                android:id="@+id/image"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:scaleType="centerCrop"
-                android:src="@mipmap/img_shuoming" />
+                android:layout_height="wrap_content">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="操作说明"
-                android:textColor="@color/base_color"
-                android:textSize="18sp" />
+                <com.lixin.listen.view.RoundAngleImageView
+                    android:id="@+id/image"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scaleType="centerCrop"
+                    android:src="@mipmap/img_shuoming" />
 
-        </FrameLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="操作说明"
+                    android:textColor="@color/base_color"
+                    android:textSize="18sp" />
 
-
-        <WebView
-            android:id="@+id/webview"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
+            </FrameLayout>
 
 
-    <ImageView
-        android:id="@+id/image_cancel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_marginBottom="-10dp"
-        android:layout_marginLeft="-10dp"
-        android:src="@mipmap/img_weiguilei_close" />
+            <WebView
+                android:id="@+id/webview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
 
-</RelativeLayout>
+
+        <ImageView
+            android:id="@+id/image_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="-10dp"
+            android:layout_marginLeft="-10dp"
+            android:src="@mipmap/img_weiguilei_close" />
+
+    </RelativeLayout>
+
+
+
+</FrameLayout>

@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
@@ -17,7 +16,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -25,6 +23,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
+import com.lixin.listen.BaseFragment;
 import com.lixin.listen.R;
 import com.lixin.listen.activity.AboutActivity;
 import com.lixin.listen.activity.FankuiActivity;
@@ -32,10 +31,9 @@ import com.lixin.listen.activity.UserInfoActivity;
 import com.lixin.listen.bean.DaySignalVO;
 import com.lixin.listen.bean.MyVO;
 import com.lixin.listen.bean.RequestVO;
-import com.lixin.listen.bean.UpdateVO;
 import com.lixin.listen.common.Constant;
+import com.lixin.listen.httpRequest.ServiceFileRequest;
 import com.lixin.listen.util.AppHelper;
-import com.lixin.listen.util.DialogHelper;
 import com.lixin.listen.util.DirTraversal;
 import com.lixin.listen.util.GlideCircleTransform;
 import com.lixin.listen.util.PrefsUtil;
@@ -55,9 +53,9 @@ import okhttp3.Call;
 import static android.app.Activity.RESULT_OK;
 
 /**
- * A simple {@link Fragment} subclass.
+ * 个人中心
  */
-public class MeFragment extends Fragment {
+public class MeFragment extends BaseFragment implements ServiceFileRequest.ServiceFileNumCallBack {
 
     @Bind(R.id.ll_fankui)
     LinearLayout llFankui;
@@ -82,6 +80,8 @@ public class MeFragment extends Fragment {
     @Bind(R.id.rl_update)
     RelativeLayout rlUpdate;
 
+    private ServiceFileRequest serviceFileRequest;
+
     private static final String PLUS = "0";
     private static final String REDUCE = "1";
 
@@ -100,9 +100,12 @@ public class MeFragment extends Fragment {
         if (TextUtils.isEmpty(PrefsUtil.getString(getActivity(), "first_set_time", ""))) {
             doRequest("30分钟");
         }
-
+        serviceFileRequest = new ServiceFileRequest(getActivity());
+        serviceFileRequest.setServiceFileNumCallBack(this);
+        serviceFileRequest.getServiceFile();
         return view;
     }
+
 
     private void getParams() {
         final List<File> files = DirTraversal.listFiles(AppHelper.getInnerFilePath(getActivity()) + File.separator
@@ -247,7 +250,7 @@ public class MeFragment extends Fragment {
             return;
         }
 
-        if (type.equals(REDUCE)){
+        if (type.equals(REDUCE)) {
             btnReduce.setEnabled(false);
         }
 
@@ -323,36 +326,7 @@ public class MeFragment extends Fragment {
 
     @OnClick(R.id.rl_update)
     public void rlUpdate() {
-//        String url = Constant.URL + "json=" + new Gson().toJson(new RequestVO("getVersion"));
-//        OkHttpUtils
-//                .get()
-//                .url(url)
-//                .build()
-//                .execute(new StringCallback() {
-//                    @Override
-//                    public void onError(Call call, Exception e, int id) {
-//                        e.printStackTrace();
-//                        Toast.makeText(getActivity(), "服务器异常,请稍后重试", Toast.LENGTH_SHORT).show();
-//                    }
-//
-//                    @Override
-//                    public void onResponse(String response, int id) {
-//                        UpdateVO vo = new Gson().fromJson(response, UpdateVO.class);
-//                        Toast.makeText(getActivity(), vo.getResultNote(), Toast.LENGTH_SHORT).show();
-//
-//                        try {
-//                            if (Integer.valueOf(vo.getVersionNumber()) > AppHelper.getVersionCode(getActivity())) {
-//                                dialog = DialogHelper.createConfirmDialog(getActivity(), "升级提示", "发现新版本，是否要升级？", "确定",
-//                                        "取消", posi, nega, DialogHelper.NO_ICON);
-//                                dialog.show();
-//                            }
-//                        } catch (Exception e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
-//
-//                });
-        new UpdateManager(getActivity()).checkUpdate();
+        new UpdateManager(getActivity()).checkUpdate(getActivity());
     }
 
     DialogInterface.OnClickListener posi = new DialogInterface.OnClickListener() {
@@ -382,13 +356,23 @@ public class MeFragment extends Fragment {
         ButterKnife.unbind(this);
     }
 
-    public void ShowToast(String text){
+    public void ShowToast(String text) {
         if (mToast == null) {
             mToast = Toast.makeText(getActivity(), text, Toast.LENGTH_SHORT);
             mToast.show();
-        }else {
+        } else {
             mToast.setText(text);
             mToast.show();
         }
+    }
+
+    @Override
+    public void serviceFiles(String num) {
+        tvService.setText(num);
+    }
+
+    @Override
+    public void loadData() {
+        serviceFileRequest.getServiceFile();
     }
 }

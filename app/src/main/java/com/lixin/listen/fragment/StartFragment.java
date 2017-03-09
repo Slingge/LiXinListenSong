@@ -13,7 +13,6 @@ import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,13 +22,13 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.lixin.listen.R;
 import com.lixin.listen.activity.RecordActivity;
-import com.lixin.listen.bean.MyVO;
 import com.lixin.listen.bean.RequestVO;
 import com.lixin.listen.bean.StartRecordVo;
 import com.lixin.listen.common.Constant;
 import com.lixin.listen.util.PrefsUtil;
+import com.lixin.listen.util.ProgressDialog;
 import com.lixin.listen.util.ToastUtil;
-import com.lixin.listen.util.abLog;
+import com.lixin.listen.view.ClickImageView;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
@@ -41,27 +40,26 @@ import okhttp3.Call;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class StartFragment extends Fragment {
+public class StartFragment extends Fragment implements ClickImageView.ClickImageViewCallBack{
 
-    @Bind(R.id.iv_start_record)
-    ImageView ivStartRecord;
+    ClickImageView ivStartRecord;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_start, container, false);
         ButterKnife.bind(this, view);
+        ivStartRecord= (ClickImageView) view.findViewById(R.id.iv_start_record);
+        ivStartRecord.setClickImageViewCallBack(this);
         return view;
     }
 
-    @OnClick(R.id.iv_start_record)
-    public void doStartRecord() {
-        doStart();
-    }
+
 
     StartRecordVo vo;
 
     private void doStart() {
+        ProgressDialog.showProgressDialog(getActivity(), null);
         String url = Constant.URL + "json=" + new Gson().toJson(new RequestVO("getTimeLength", PrefsUtil.getString(getActivity(), "userid", "")));
         OkHttpUtils
                 .get()
@@ -88,12 +86,14 @@ public class StartFragment extends Fragment {
                                 Toast.makeText(getActivity(), "请开启录音权限", Toast.LENGTH_LONG).show();
                                 ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
                             }
+                            ProgressDialog.dismissDialog();
                         } else {
+                            ProgressDialog.dismissDialog();
                             ToastUtil.showToast(vo.getResultNote());
                         }
                     }
-
                 });
+        ProgressDialog.dismissDialog();
     }
 
 
@@ -144,5 +144,10 @@ public class StartFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         ButterKnife.unbind(this);
+    }
+
+    @Override
+    public void clickImage() {
+        doStart();
     }
 }
