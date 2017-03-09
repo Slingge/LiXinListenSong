@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_record"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.lixin.listen.activity.RecordActivity">
+
+    <include layout="@layout/layout_title_left"></include>
+
+    <RelativeLayout
+        android:id="@+id/rl_record"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="20dp"
+        android:layout_below="@+id/ll_title"
+        android:layout_centerHorizontal="true">
+
+        <com.czp.library.ArcProgress
+            android:id="@+id/myProgress01"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:progressColor="@color/base_color"
+            app:radius="150dp"
+            app:tickDensity="4" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="20dp"
+            android:src="@mipmap/img_record_bird"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentBottom="true"/>
+
+        <TextView
+            android:id="@+id/tv_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:textSize="60sp"
+            android:layout_marginTop="100dp"
+            android:format="%s"
+            />
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/tv_fenbei"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="asdfasdf"
+        android:visibility="gone"/>
+
+    <TextView
+        android:id="@+id/tv_shijian"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_fenbei"/>
+
+    <Button
+        android:id="@+id/btn_stop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:background="@mipmap/img_record_finish"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/rl_record"/>
+
+    <ImageView
+        android:id="@+id/iv_low"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_alignParentBottom="true"
+        />
+
+    <ImageView
+        android:id="@+id/iv_mid"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_alignParentBottom="true"/>
+
+    <ImageView
+        android:id="@+id/iv_high"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_alignParentBottom="true"/>
+
+</RelativeLayout>

@@ -1,0 +1,5 @@
+int drawable layout_bg 0x7f020000
+int drawable wheel_bg 0x7f020001
+int drawable wheel_bg1 0x7f020002
+int drawable wheel_val 0x7f020003
+int drawable wheel_val1 0x7f020004

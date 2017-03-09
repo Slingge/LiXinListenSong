@@ -1,0 +1,22 @@
+[
+    {
+        "merged": "E:\\WorkSpace\\LiXin\\wheel\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable\\wheel_val1.xml",
+        "source": "E:\\WorkSpace\\LiXin\\wheel\\build\\intermediates\\bundles\\debug\\res\\drawable\\wheel_val1.xml"
+    },
+    {
+        "merged": "E:\\WorkSpace\\LiXin\\wheel\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable\\layout_bg.xml",
+        "source": "E:\\WorkSpace\\LiXin\\wheel\\build\\intermediates\\bundles\\debug\\res\\drawable\\layout_bg.xml"
+    },
+    {
+        "merged": "E:\\WorkSpace\\LiXin\\wheel\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable\\wheel_val.xml",
+        "source": "E:\\WorkSpace\\LiXin\\wheel\\build\\intermediates\\bundles\\debug\\res\\drawable\\wheel_val.xml"
+    },
+    {
+        "merged": "E:\\WorkSpace\\LiXin\\wheel\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable\\wheel_bg.xml",
+        "source": "E:\\WorkSpace\\LiXin\\wheel\\build\\intermediates\\bundles\\debug\\res\\drawable\\wheel_bg.xml"
+    },
+    {
+        "merged": "E:\\WorkSpace\\LiXin\\wheel\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable\\wheel_bg1.xml",
+        "source": "E:\\WorkSpace\\LiXin\\wheel\\build\\intermediates\\bundles\\debug\\res\\drawable\\wheel_bg1.xml"
+    }
+]

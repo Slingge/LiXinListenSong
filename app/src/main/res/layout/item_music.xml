@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="130dp"
+    android:background="@mipmap/img_music_all"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/rl_shang"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingRight="10dp"
+        >
+
+        <RelativeLayout
+            android:id="@+id/rl_play"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginLeft="5dp">
+
+            <ImageView
+                android:id="@+id/iv_play"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="15dp"
+                android:src="@mipmap/img_play" />
+
+            <ImageView
+                android:id="@+id/iv_pause"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="15dp"
+                android:src="@mipmap/img_pause"
+                android:visibility="gone"/>
+
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/tv_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:textSize="20sp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:textColor="@color/windowBackground"
+            android:layout_toRightOf="@+id/rl_play"
+            android:text="adsfasdf" />
+
+        <LinearLayout
+            android:id="@+id/ll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/tv_name"
+            android:layout_marginRight="15dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tv_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/windowBackground"
+                android:text="00:00"
+                android:textSize="14sp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/windowBackground"
+                android:text="/"
+                android:textSize="14sp"/>
+
+            <TextView
+                android:id="@+id/tv_all_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/windowBackground"
+                android:text="00:00"
+                android:textSize="14sp"/>
+        </LinearLayout>
+
+
+        <SeekBar
+            android:id="@+id/sb"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:layout_alignParentRight="true"
+            android:layout_toRightOf="@+id/rl_play"
+            android:layout_below="@+id/ll"
+            android:layout_alignParentEnd="true"
+            style="@style/Widget.SeekBar.Normal"
+            />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:gravity="bottom"
+        android:paddingRight="25dp"
+        android:paddingBottom="10sp">
+
+        <TextView
+            android:id="@+id/tv_zhuanji_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:gravity="center_vertical"
+            android:layout_marginLeft="20dp"
+            android:drawablePadding="5dp"
+            android:text="专辑"
+            android:textSize="12sp"
+            android:textColor="@color/col3"
+            android:visibility="gone"
+            android:drawableLeft="@mipmap/img_zhuanji_icon"/>
+
+        <ImageView
+            android:id="@+id/iv_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_alignParentRight="true"
+            android:src="@mipmap/img_delete" />
+
+        <ImageView
+            android:id="@+id/iv_share"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginRight="10dp"
+            android:layout_toLeftOf="@+id/iv_delete"
+            android:src="@mipmap/img_fenxiang"
+            android:visibility="gone"
+            />
+
+        <ImageView
+            android:id="@+id/iv_upload"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:src="@mipmap/img_upload"
+            android:layout_marginRight="10dp"
+            android:layout_toLeftOf="@+id/iv_delete"
+            android:visibility="gone"
+             />
+
+        <ImageView
+            android:id="@+id/iv_uploaded"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginRight="10dp"
+            android:src="@mipmap/img_uploaded"
+            android:layout_toLeftOf="@+id/iv_delete"
+            android:visibility="gone"
+            />
+
+        <ImageView
+            android:id="@+id/iv_weilei"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginRight="10dp"
+            android:layout_toLeftOf="@+id/iv_upload"
+            android:src="@mipmap/img_guileizhuanji" />
+
+        <ImageView
+            android:id="@+id/iv_chongxingeilei"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginRight="10dp"
+            android:layout_toLeftOf="@+id/iv_upload"
+            android:src="@mipmap/img_chongxin_guilei"
+            android:visibility="gone"/>
+    </RelativeLayout>
+
+</RelativeLayout>
