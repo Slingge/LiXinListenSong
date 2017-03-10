@@ -22,6 +22,7 @@ import com.lixin.listen.bean.QuestionListvo;
 import com.lixin.listen.bean.RequestVO;
 import com.lixin.listen.common.Constant;
 import com.lixin.listen.util.PrefsUtil;
+import com.lixin.listen.util.ProgressDialog;
 import com.lixin.listen.widget.recyclerview.CommonAdapter;
 import com.lixin.listen.widget.recyclerview.MultiItemTypeAdapter;
 import com.lixin.listen.widget.recyclerview.ViewHolder;
@@ -85,6 +86,7 @@ public class FankuiActivity extends AppCompatActivity {
             public void onItemClick(View view, RecyclerView.ViewHolder holder, int position) {
                 Intent intent = new Intent(FankuiActivity.this, FankuiXiangQingActivity.class);
                 intent.putExtra("questionId", questionList.get(position).getQuestionId());
+                intent.putExtra("title",questionList.get(position).getQuestionName());
                 startActivityForResult(intent, 1000);
             }
 
@@ -96,6 +98,7 @@ public class FankuiActivity extends AppCompatActivity {
     }
 
     private void loadData() {
+        ProgressDialog.showProgressDialog(this, null);
         RequestVO vo = new RequestVO();
         vo.setCmd("getQuestionList");
         String url = Constant.URL + "json=" + new Gson().toJson(vo);
@@ -117,6 +120,7 @@ public class FankuiActivity extends AppCompatActivity {
                     }
 
                 });
+        ProgressDialog.dismissDialog();
     }
 
     private void upadataViews(QuestionListvo vo) {
@@ -128,9 +132,11 @@ public class FankuiActivity extends AppCompatActivity {
     }
 
     @OnClick(R.id.btn_commit)
-    public void doCommit(){
-        if (TextUtils.isEmpty(etContent.getText().toString())){
+    public void doCommit() {
+        ProgressDialog.showProgressDialog(this, null);
+        if (TextUtils.isEmpty(etContent.getText().toString())) {
             Toast.makeText(this, "内容不能为空", Toast.LENGTH_SHORT).show();
+            ProgressDialog.dismissDialog();
             return;
         }
 //        if (TextUtils.isEmpty(etPhone.getText().toString())){
@@ -157,7 +163,7 @@ public class FankuiActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(String response, int id) {
                         CommonVO vo = new Gson().fromJson(response, CommonVO.class);
-                        if (vo.getResult().endsWith("0")){
+                        if (vo.getResult().endsWith("0")) {
 
                             finish();
                         }
@@ -165,6 +171,7 @@ public class FankuiActivity extends AppCompatActivity {
                     }
 
                 });
+        ProgressDialog.dismissDialog();
     }
 
     @OnClick(R.id.iv_back)

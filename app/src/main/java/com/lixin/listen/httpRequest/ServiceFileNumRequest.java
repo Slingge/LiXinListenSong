@@ -19,7 +19,7 @@ import okhttp3.Call;
  * Created by Slingge on 2017/3/9 0009.
  */
 
-public class ServiceFileRequest {
+public class ServiceFileNumRequest {
 
     private Context context;
 
@@ -34,7 +34,7 @@ public class ServiceFileRequest {
         this.serviceFileNumCallBack = serviceFileNumCallBack;
     }
 
-    public ServiceFileRequest(Context context) {
+    public ServiceFileNumRequest(Context context) {
         this.context = context;
     }
 

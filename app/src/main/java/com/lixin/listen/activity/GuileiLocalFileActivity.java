@@ -26,6 +26,7 @@ import com.lixin.listen.common.Constant;
 import com.lixin.listen.util.MaxLengthWatcher;
 import com.lixin.listen.util.MediaPlayerUtil;
 import com.lixin.listen.util.PrefsUtil;
+import com.lixin.listen.util.ToastUtil;
 import com.lixin.listen.view.ClickButton;
 import com.lixin.listen.view.ClickImageView;
 import com.lixin.listen.view.ClickImageView.ClickImageViewCallBack;
@@ -41,7 +42,7 @@ import static com.lixin.listen.R.id.iv_tuijianzhuanji;
 /**
  * 归类本地文件
  */
-public class GuileiLocalFileActivity extends AppCompatActivity implements ClickImageViewCallBack,ClickButton.ClickButtonCallBack{
+public class GuileiLocalFileActivity extends AppCompatActivity implements ClickImageViewCallBack, ClickButton.ClickButtonCallBack {
 
     @Bind(R.id.iv_back)
     ImageView ivBack;
@@ -110,16 +111,15 @@ public class GuileiLocalFileActivity extends AppCompatActivity implements ClickI
         ButterKnife.bind(this);
         getParams();
         initViews();
-        ivTuijianzhuanji= (ClickImageView) findViewById(R.id.iv_tuijianzhuanji);
+        ivTuijianzhuanji = (ClickImageView) findViewById(R.id.iv_tuijianzhuanji);
         ivTuijianzhuanji.setClickImageViewCallBack(this);
-        btnSave= (ClickButton) findViewById(R.id.btn_save);
+        btnSave = (ClickButton) findViewById(R.id.btn_save);
         btnSave.setClickButtonCallBack(this);
 
     }
 
     private void getParams() {
         musicBean = (MusicBean) getIntent().getSerializableExtra("vo");
-
     }
 
     private void initViews() {
@@ -141,7 +141,7 @@ public class GuileiLocalFileActivity extends AppCompatActivity implements ClickI
             quziName = musicBean.getMusicName().substring(musicBean.getMusicName().indexOf("#") + 1,
                     musicBean.getMusicName().indexOf("%"));
             etName.setText(quziName);
-            tvZhuanji.setText(zhuanjiName);
+//            tvZhuanji.setText(zhuanjiName);
             tvZhuanjiIcon.setText(zhuanjiName);
             tvZhuanjiIcon.setVisibility(View.VISIBLE);
             tvName.setText(quziName);
@@ -269,7 +269,9 @@ public class GuileiLocalFileActivity extends AppCompatActivity implements ClickI
                 intent.putExtra("firstTypeId", firstTypeId);
                 intent.putExtra("secondTypeId", secondTypeId);
                 intent.putExtra("thirdTypeId", thirdTypeId);
+
                 intent.putExtra("albumName", etName.getText().toString());
+                intent.putExtra("musicId", getIntent().getStringExtra("musicId"));
                 intent.putExtra("fileTime", finalFilePath.substring(finalFilePath.indexOf("_") + 1, finalFilePath.indexOf("_") + 14));
                 PrefsUtil.putString(GuileiLocalFileActivity.this, finalFilePath.substring(finalFilePath.indexOf("_") + 1, finalFilePath.indexOf("_") + 14), firstTypeId +
                         "," + secondTypeId + "," + thirdTypeId + "," + etName.getText().toString());
@@ -278,9 +280,7 @@ public class GuileiLocalFileActivity extends AppCompatActivity implements ClickI
                     PrefsUtil.putString(GuileiLocalFileActivity.this, Constant.FIRST_ROOT, firstTypeId);
                 } else {
                     String firstRoot = PrefsUtil.getString(GuileiLocalFileActivity.this, Constant.FIRST_ROOT, "");
-                    PrefsUtil.putString(GuileiLocalFileActivity.this, Constant.FIRST_ROOT, firstTypeId + "," +
-                            firstRoot
-                    );
+                    PrefsUtil.putString(GuileiLocalFileActivity.this, Constant.FIRST_ROOT, firstTypeId + "," +firstRoot);
                 }
                 // 保存二级目录
                 if (TextUtils.isEmpty(PrefsUtil.getString(GuileiLocalFileActivity.this, Constant.SECOND_ROOT, ""))) {
@@ -296,7 +296,6 @@ public class GuileiLocalFileActivity extends AppCompatActivity implements ClickI
                     String thirdRoot = PrefsUtil.getString(GuileiLocalFileActivity.this, Constant.THIRD_ROOT, "");
                     PrefsUtil.putString(GuileiLocalFileActivity.this, Constant.THIRD_ROOT, thirdTypeId + "," + thirdRoot);
                 }
-
                 setResult(RESULT_OK, intent);
                 finish();
             }

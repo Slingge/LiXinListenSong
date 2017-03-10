@@ -7,6 +7,11 @@
     android:orientation="vertical"
     tools:context="com.lixin.listen.activity.FankuiXiangQingActivity">
 
-    <include layout="@layout/layout_title_left"></include>
+    <include layout="@layout/layout_title_left" />
+
+    <WebView
+        android:id="@+id/webview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 </LinearLayout>

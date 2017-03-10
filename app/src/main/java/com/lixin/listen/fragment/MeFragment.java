@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -32,7 +31,7 @@ import com.lixin.listen.bean.DaySignalVO;
 import com.lixin.listen.bean.MyVO;
 import com.lixin.listen.bean.RequestVO;
 import com.lixin.listen.common.Constant;
-import com.lixin.listen.httpRequest.ServiceFileRequest;
+import com.lixin.listen.httpRequest.ServiceFileNumRequest;
 import com.lixin.listen.util.AppHelper;
 import com.lixin.listen.util.DirTraversal;
 import com.lixin.listen.util.GlideCircleTransform;
@@ -55,7 +54,7 @@ import static android.app.Activity.RESULT_OK;
 /**
  * 个人中心
  */
-public class MeFragment extends BaseFragment implements ServiceFileRequest.ServiceFileNumCallBack {
+public class MeFragment extends BaseFragment implements ServiceFileNumRequest.ServiceFileNumCallBack {
 
     @Bind(R.id.ll_fankui)
     LinearLayout llFankui;
@@ -80,7 +79,7 @@ public class MeFragment extends BaseFragment implements ServiceFileRequest.Servi
     @Bind(R.id.rl_update)
     RelativeLayout rlUpdate;
 
-    private ServiceFileRequest serviceFileRequest;
+    private ServiceFileNumRequest serviceFileRequest;
 
     private static final String PLUS = "0";
     private static final String REDUCE = "1";
@@ -100,7 +99,7 @@ public class MeFragment extends BaseFragment implements ServiceFileRequest.Servi
         if (TextUtils.isEmpty(PrefsUtil.getString(getActivity(), "first_set_time", ""))) {
             doRequest("30分钟");
         }
-        serviceFileRequest = new ServiceFileRequest(getActivity());
+        serviceFileRequest = new ServiceFileNumRequest(getActivity());
         serviceFileRequest.setServiceFileNumCallBack(this);
         serviceFileRequest.getServiceFile();
         return view;

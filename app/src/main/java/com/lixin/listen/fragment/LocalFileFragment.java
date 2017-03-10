@@ -1,16 +1,15 @@
 package com.lixin.listen.fragment;
 
 
-import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,7 +26,6 @@ import com.lixin.listen.R;
 import com.lixin.listen.activity.ChooseZhuanjiActivity;
 import com.lixin.listen.activity.GuileiActivity;
 import com.lixin.listen.activity.GuileiLocalFileActivity;
-import com.lixin.listen.activity.RecordActivity;
 import com.lixin.listen.bean.CommonVO;
 import com.lixin.listen.bean.CurrentDayTimeVo;
 import com.lixin.listen.bean.IPlayCompleted;
@@ -41,17 +39,21 @@ import com.lixin.listen.util.AppHelper;
 import com.lixin.listen.util.BusProvider;
 import com.lixin.listen.util.CustomDialog;
 import com.lixin.listen.util.DateUtil;
-import com.lixin.listen.util.DialogHelper;
 import com.lixin.listen.util.DirTraversal;
 import com.lixin.listen.util.MediaPlayerUtil;
-import com.lixin.listen.util.Player;
 import com.lixin.listen.util.PrefsUtil;
+import com.lixin.listen.util.ProgressDialog;
+import com.lixin.listen.util.ToastUtil;
+import com.lixin.listen.util.abLog;
 import com.lixin.listen.widget.CommonAdapter;
 import com.lixin.listen.widget.CommonListView;
 import com.lixin.listen.widget.ViewHolder;
 import com.squareup.otto.Subscribe;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -67,9 +69,11 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import okhttp3.Call;
 
+import static android.R.string.ok;
 import static android.app.Activity.RESULT_OK;
 
 /**
+ * 本地文件
  * A simple {@link Fragment} subclass.
  */
 public class LocalFileFragment extends Fragment {
@@ -128,7 +132,11 @@ public class LocalFileFragment extends Fragment {
 
     private List<MusicBean> temList = new ArrayList<>();
 
-    CustomDialog dialog ;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private int flag = -1;//0按日期，1按专辑，2未归类
+    MusicBean updatemusicBean;
+
+    CustomDialog dialog;
 
     ViewHolder lastHolder;
     int lastPos = 0;
@@ -143,7 +151,32 @@ public class LocalFileFragment extends Fragment {
         BusProvider.getInstance().register(this);
         getParams();
         initViews();
+        initRefresh(view);
         return view;
+    }
+
+
+    private void initRefresh(View view) {
+        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipeRefreshLayout);
+        swipeRefreshLayout.setColorSchemeResources(R.color.base_color);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                new Handler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (flag == 0) {
+                            riqi();
+                        } else if (flag == 1) {
+                            zhuanji();
+                        } else if (flag == 2) {
+                            weiguilei();
+                        }
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+                });
+            }
+        });
     }
 
     public void setClick() {
@@ -177,7 +210,7 @@ public class LocalFileFragment extends Fragment {
 
     private void initViews() {
 
-        dialog = new CustomDialog(getActivity(),  R.style.CustomDialog);
+        dialog = new CustomDialog(getActivity(), R.style.CustomDialog);
 
         final Typeface tf = Typeface.createFromAsset(getActivity().getAssets(), "MyriadPro-BoldCond.otf");
         tvTime.setTypeface(tf);
@@ -197,15 +230,15 @@ public class LocalFileFragment extends Fragment {
                 holder.setText(R.id.tv_all_time, ShowTime(getFileTime(musicBean.getFilePath())));
 
                 if (musicBean.isUpload()) {
-                    ((ImageView)holder.getView(R.id.iv_upload)).setVisibility(View.INVISIBLE);
+                    ((ImageView) holder.getView(R.id.iv_upload)).setVisibility(View.INVISIBLE);
                     holder.setVisible(R.id.iv_uploaded, true);
                 } else {
                     holder.setVisible(R.id.iv_upload, true);
                     holder.setVisible(R.id.iv_uploaded, false);
                 }
 
-                if (PrefsUtil.getString(getActivity(),"@" + musicBean.getFilePath().substring(musicBean.getFilePath().indexOf("_")), "").equals("uploaded")) {
-                    ((ImageView)holder.getView(R.id.iv_upload)).setVisibility(View.INVISIBLE);
+                if (PrefsUtil.getString(getActivity(), "@" + musicBean.getFilePath().substring(musicBean.getFilePath().indexOf("_")), "").equals("uploaded")) {
+                    ((ImageView) holder.getView(R.id.iv_upload)).setVisibility(View.INVISIBLE);
                     holder.setVisible(R.id.iv_uploaded, true);
                 } else {
                     holder.setVisible(R.id.iv_upload, true);
@@ -239,7 +272,9 @@ public class LocalFileFragment extends Fragment {
                     public void onClick(View v) {
                         Intent intent = new Intent(getActivity(), GuileiLocalFileActivity.class);
                         intent.putExtra("vo", musicBean);
-                        startActivityForResult(intent, 1000);
+                        intent.putExtra("musicId", PrefsUtil.getString(getActivity(), musicBean.getMusicName(), ""));
+                        startActivityForResult(intent, 3000);
+                        updatemusicBean = musicBean;
                     }
                 });
 
@@ -269,11 +304,10 @@ public class LocalFileFragment extends Fragment {
                     }
                 });
 
-                if (musicBean.isPlaying()){
+                if (musicBean.isPlaying()) {
                     holder.setVisible(R.id.iv_pause, true);
                     holder.setVisible(R.id.iv_play, false);
-                }
-                else {
+                } else {
                     holder.setVisible(R.id.iv_pause, false);
                     holder.setVisible(R.id.iv_play, true);
                 }
@@ -284,10 +318,9 @@ public class LocalFileFragment extends Fragment {
                     public void onClick(View v) {
                         // 把上次播放的状态清空
                         for (int i = 0; i < commonAdapter.getDataList().size(); i++) {
-                            if (holder.getPosition() == i){
+                            if (holder.getPosition() == i) {
                                 commonAdapter.getDataList().get(i).setPlaying(true);
-                            }
-                            else {
+                            } else {
                                 commonAdapter.getDataList().get(i).setPlaying(false);
                             }
 
@@ -392,7 +425,6 @@ public class LocalFileFragment extends Fragment {
     }
 
 
-
     @Override
     public void onPause() {
         super.onPause();
@@ -410,7 +442,7 @@ public class LocalFileFragment extends Fragment {
         resetStatus();
     }
 
-    private void resetStatus(){
+    private void resetStatus() {
         for (MusicBean bean : commonAdapter.getDataList()) {
             bean.setPlaying(false);
         }
@@ -467,6 +499,7 @@ public class LocalFileFragment extends Fragment {
                         PrefsUtil.putString(getActivity(), "@" + musicBean.getFilePath().substring(musicBean.getFilePath().indexOf("_"))
                                 , "uploaded");
                         musicBean.setUpload(true);
+                        PrefsUtil.putString(getActivity(), musicBean.getMusicName(), vo.getMid() + "");
                         commonAdapter.notifyDataSetChanged();
                         dialog.dismiss();
                     }
@@ -500,6 +533,7 @@ public class LocalFileFragment extends Fragment {
 
     @OnClick(R.id.ll_riqi)
     public void riqi() {
+        flag = 0;
         rlTime.setVisibility(View.VISIBLE);
         ivRiqi.setBackgroundResource(R.mipmap.img_light_bright);
         tvRiqi.setTextColor(getResources().getColor(R.color.base_color));
@@ -529,6 +563,7 @@ public class LocalFileFragment extends Fragment {
 
     @OnClick(R.id.ll_weiguilei)
     public void weiguilei() {
+        flag = 2;
         rlTime.setVisibility(View.GONE);
         ivWeiguilei.setBackgroundResource(R.mipmap.img_light_bright);
         tvWeiguilei.setTextColor(getResources().getColor(R.color.base_color));
@@ -557,6 +592,7 @@ public class LocalFileFragment extends Fragment {
 
     @OnClick(R.id.ll_zhuanji)
     public void zhuanji() {
+        flag = 1;
         rlTime.setVisibility(View.GONE);
         ivZhuanji.setBackgroundResource(R.mipmap.img_light_bright);
         tvZhuanji.setTextColor(getResources().getColor(R.color.base_color));
@@ -627,8 +663,6 @@ public class LocalFileFragment extends Fragment {
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-
-
                     }
 
                 });
@@ -698,9 +732,58 @@ public class LocalFileFragment extends Fragment {
             Intent intent = new Intent(getActivity(), GuileiLocalFileActivity.class);
             intent.putExtra("vo", musicBean);
             startActivityForResult(intent, 1000);
+        } else if (requestCode == 3000 && resultCode == RESULT_OK) {//重新归类
+            musicBeanList.clear();
+            getParams();
+            String firstTypeId, secondTypeId, thirdTypeId;
+            String id = updatemusicBean.getFilePath().substring(updatemusicBean.getFilePath().indexOf("_") + 1, updatemusicBean.getFilePath().indexOf("_") + 14);
+            firstTypeId = PrefsUtil.getString(getActivity(), id, "").split(",")[0];
+            secondTypeId = PrefsUtil.getString(getActivity(), id, "").split(",")[1];
+            thirdTypeId = PrefsUtil.getString(getActivity(), id, "").split(",")[2];
+
+            upDateService(data.getStringExtra("musicId"), firstTypeId, secondTypeId, thirdTypeId, data.getStringExtra("albumName"));
         }
 
     }
+
+
+    /**
+     * 重新归类更新服务器
+     * albumid 曲目Id
+     * firstTypeId 新所属一级分类
+     * secondTypeId 新所属二级分类
+     * thirdTypeId 新所属三级分类(专辑ID)
+     * albumName 新曲目名称
+     */
+    private void upDateService(final String albumid, String firstTypeId, String secondTypeId, String thirdTypeId, final String albumName) {
+        ProgressDialog.showProgressDialog(getActivity(), "更新服务器数据...");
+        String json = "{\"cmd\":\"updateType\",\"uid\":\"" + PrefsUtil.getString(getActivity(), "userid", "") + "\",\"albumid\":\"" + albumid +
+                "\",\"firstTypeId\":\"" + firstTypeId + "\",\"secondTypeId\":\"" + secondTypeId + "\",\"thirdTypeId\":\"" + thirdTypeId + "\",\"albumName\":\"" + albumName + "\"}";
+        abLog.e("重新归类参数...........", json);
+        OkHttpUtils.post().url(Constant.URL).addParams("json", json).build().execute(new StringCallback() {
+            @Override
+            public void onError(Call call, Exception e, int id) {
+                ToastUtil.showToast("网络错误，更新服务器数据失败");
+            }
+
+            @Override
+            public void onResponse(String response, int id) {
+                abLog.e("重新归类结果..............", response);
+                try {
+                    JSONObject obj = new JSONObject(response);
+                    if (obj.getString("result").equals("0")) {
+                        PrefsUtil.putString(getActivity(),albumName,albumid);
+                    } else {
+                        ToastUtil.showToast(obj.getString("resultNote"));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        ProgressDialog.dismissDialog();
+    }
+
 
     // 刷新专辑列表
     private void doRefreshZhuanji() {

@@ -2,9 +2,10 @@ package com.lixin.listen.fragment;
 
 
 import android.content.DialogInterface;
-import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -19,18 +20,14 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 import com.lixin.listen.R;
-import com.lixin.listen.activity.ChooseZhuanjiActivity;
 import com.lixin.listen.bean.CommonVO;
 import com.lixin.listen.bean.IPlayCompleted;
 import com.lixin.listen.bean.ISeekbarProgress;
-import com.lixin.listen.bean.MusicBean;
 import com.lixin.listen.bean.MyZhuanjiVo;
 import com.lixin.listen.bean.RequestVO;
 import com.lixin.listen.bean.ZhuanjiQuziVO;
 import com.lixin.listen.common.Constant;
 import com.lixin.listen.util.MediaPlayerUtil;
-import com.lixin.listen.util.PlayAudioManager;
-import com.lixin.listen.util.Player;
 import com.lixin.listen.util.PrefsUtil;
 import com.lixin.listen.util.ProgressDialog;
 import com.lixin.listen.util.abLog;
@@ -40,7 +37,6 @@ import com.lixin.listen.widget.recyclerview.ViewHolder;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,6 +60,8 @@ public class ServerFileFragment extends Fragment {
     private CommonAdapter<ZhuanjiQuziVO.AlbumListBean> quziAdapter;
     private List<ZhuanjiQuziVO.AlbumListBean> quziList = new ArrayList<>();
 
+    private SwipeRefreshLayout swipeRefreshLayout;
+
     private int zhuanji_index = 0;
 
     @Override
@@ -74,8 +72,32 @@ public class ServerFileFragment extends Fragment {
         ButterKnife.bind(this, view);
         initViews();
         loadData();
+        init(view);
         return view;
     }
+
+
+    private void init(View view) {
+        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipeRefreshLayout);
+        swipeRefreshLayout.setColorSchemeResources(R.color.base_color);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                new Handler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        zhuanjiList.clear();
+                        zhuanjiAdapter.notifyDataSetChanged();
+                        quziList.clear();
+                        quziAdapter.notifyDataSetChanged();
+                        loadData();
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+                });
+            }
+        });
+    }
+
 
     private void initViews() {
         // 专辑
@@ -343,7 +365,6 @@ public class ServerFileFragment extends Fragment {
 
                     @Override
                     public void onResponse(String response, int id) {
-                        abLog.e("我的专辑.............", response);
                         MyZhuanjiVo vo = new Gson().fromJson(response, MyZhuanjiVo.class);
                         updateMyzhuanji(vo);
                         ProgressDialog.dismissDialog();

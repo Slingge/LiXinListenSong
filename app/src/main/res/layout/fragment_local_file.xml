@@ -93,10 +93,10 @@
             android:layout_height="39dp"
             android:layout_marginLeft="165dp"
             android:layout_marginRight="15dp"
-            android:paddingLeft="15dp"
             android:background="@drawable/round_grey"
             android:gravity="center_vertical"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingLeft="15dp">
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -222,27 +222,33 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="15dp"
-            android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
-            android:src="@mipmap/img_triangle_down"/>
+            android:layout_centerVertical="true"
+            android:layout_marginRight="15dp"
+            android:src="@mipmap/img_triangle_down" />
 
     </RelativeLayout>
 
 
-    <com.lixin.listen.widget.CommonScrollView
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
-        <com.lixin.listen.widget.CommonListView
-            android:id="@+id/lv"
+        <android.support.v4.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:divider="@null"
-            android:dividerHeight="0dp"
-            android:padding="10dp"></com.lixin.listen.widget.CommonListView>
+            android:layout_height="match_parent">
 
-    </com.lixin.listen.widget.CommonScrollView>
+            <com.lixin.listen.widget.CommonListView
+                android:id="@+id/lv"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:divider="@null"
+                android:dividerHeight="0dp"
+                android:padding="10dp" />
+
+        </android.support.v4.widget.NestedScrollView>
+    </android.support.v4.widget.SwipeRefreshLayout>
 
 
 </LinearLayout>

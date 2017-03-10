@@ -3,6 +3,7 @@ package com.lixin.listen.activity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -10,10 +11,11 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.lixin.listen.R;
-import com.lixin.listen.bean.DaySignalVO;
 import com.lixin.listen.bean.FankuixiangqingVO;
 import com.lixin.listen.bean.RequestVO;
 import com.lixin.listen.common.Constant;
+import com.lixin.listen.util.ProgressDialog;
+import com.lixin.listen.util.ToastUtil;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
@@ -33,6 +35,8 @@ public class FankuiXiangQingActivity extends AppCompatActivity {
     @Bind(R.id.activity_fankui_xiang_qing)
     LinearLayout activityFankuiXiangQing;
 
+    private WebView webview;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,10 +44,12 @@ public class FankuiXiangQingActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         getParams();
         initViews();
+        webview = (WebView) findViewById(R.id.webview);
         loadData();
     }
 
     private void loadData() {
+        ProgressDialog.showProgressDialog(this, null);
         RequestVO vo = new RequestVO();
         vo.setCmd("getQuestionDetail");
         vo.setQuestionId(questionId);
@@ -62,11 +68,15 @@ public class FankuiXiangQingActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(String response, int id) {
                         FankuixiangqingVO vo = new Gson().fromJson(response, FankuixiangqingVO.class);
-                        Toast.makeText(FankuiXiangQingActivity.this, vo.getResultNote(), Toast.LENGTH_SHORT).show();
+                        if(vo.getResult().equals("0")){
+                            webview.loadUrl(vo.getQuestionAnswer());
+                        }else{
+                            ToastUtil.showToast(vo.getResultNote());
+                        }
                     }
 
                 });
-
+        ProgressDialog.dismissDialog();
     }
 
     private void initViews() {
@@ -76,7 +86,7 @@ public class FankuiXiangQingActivity extends AppCompatActivity {
                 finish();
             }
         });
-        tvTitle.setText("反馈详情");
+        tvTitle.setText(getIntent().getStringExtra("title"));
     }
 
     private void getParams() {

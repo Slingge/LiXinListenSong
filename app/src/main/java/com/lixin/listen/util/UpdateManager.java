@@ -72,16 +72,15 @@ public class UpdateManager {
     private Handler mGetVersionHandler = new Handler() {
         public void handleMessage(Message msg) {
             UpdateVO jsonObject = (UpdateVO) msg.obj;
-            System.out.println(jsonObject.toString());
-            Log.e("----------", jsonObject.toString());
+//            Log.e("----------", jsonObject.toString());
             try {
                 mVersion_code = jsonObject.getVersionNumber();
                 //mVersion_name = jsonObject.getString("version_name");
                 //mVersion_desc = jsonObject.getString("version_desc");
                 mVersion_path = jsonObject.getUpdataAddress();
 
-                Log.e("version ", mVersion_code);
-                Log.e("downurl ", mVersion_path);
+//                Log.e("version ", mVersion_code);
+//                Log.e("downurl ", mVersion_path);
 
                 if (isUpdate()) {
                     //Toast.makeText(mContext, "需要更新", Toast.LENGTH_SHORT).show();

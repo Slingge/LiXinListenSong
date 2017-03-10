@@ -12,7 +12,6 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
 import com.lixin.listen.R;
-import com.lixin.listen.dialog.OperatingDlg;
 import com.lixin.listen.util.MediaPlayerUtil;
 
 import butterknife.Bind;
