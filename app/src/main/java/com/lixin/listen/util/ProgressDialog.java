@@ -17,8 +17,6 @@ public class ProgressDialog {
 
     public static android.app.ProgressDialog proDialog;
 
-    public static Dialog progressDlg;
-
     public static void dismissDialog() {
         if (proDialog != null && proDialog.isShowing()) {
             proDialog.dismiss();
@@ -40,7 +38,6 @@ public class ProgressDialog {
             proDialog.show();
         }
     }
-
 
 
 }

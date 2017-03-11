@@ -191,6 +191,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="20dp"
-        android:background="@mipmap/img_commit" />
+        android:background="@drawable/submit_btn_click" />
 
 </LinearLayout>

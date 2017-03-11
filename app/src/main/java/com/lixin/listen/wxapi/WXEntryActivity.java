@@ -15,6 +15,7 @@ import com.lixin.listen.bean.TokenVo;
 import com.lixin.listen.bean.UserInfoVo;
 import com.lixin.listen.common.Constant;
 import com.lixin.listen.util.PrefsUtil;
+import com.lixin.listen.util.ProgressDialog;
 import com.tencent.mm.sdk.openapi.BaseReq;
 import com.tencent.mm.sdk.openapi.BaseResp;
 import com.tencent.mm.sdk.openapi.IWXAPIEventHandler;
@@ -55,7 +56,7 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        ProgressDialog.showProgressDialog(this, null);
         Application.api = WXAPIFactory.createWXAPI(this, Constant.APP_ID, true);
         Application.api.registerApp(Constant.APP_ID);
         Application.api.handleIntent(getIntent(), WXEntryActivity.this);  //必须调用此句话
@@ -84,6 +85,7 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
     }
 
     private void getToken(String code) {
+
         String url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid="
                 + Constant.APP_ID
                 + "&secret="
@@ -99,6 +101,7 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
                     @Override
                     public void onError(Call call, Exception e, int id) {
                         Toast.makeText(WXEntryActivity.this, "服务器异常,请稍后重试", Toast.LENGTH_SHORT).show();
+                        ProgressDialog.dismissDialog();
                     }
 
                     @Override
@@ -120,6 +123,7 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
                 .execute(new StringCallback() {
                     @Override
                     public void onError(Call call, Exception e, int id) {
+                        ProgressDialog.dismissDialog();
                         Toast.makeText(WXEntryActivity.this, "服务器异常,请稍后重试", Toast.LENGTH_SHORT).show();
                     }
 
@@ -136,10 +140,9 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
         String json = "json=" + new Gson().toJson(new RequestVO("thirdLogin", vo.getUnionid(), vo.getNickname(), vo.getHeadimgurl()));
         OkHttpUtils
                 .get()
-                .url(Constant.URL+ json)
+                .url(Constant.URL + json)
                 .build()
-                .execute(new StringCallback()
-                {
+                .execute(new StringCallback() {
                     @Override
                     public void onError(Call call, Exception e, int id) {
                         Toast.makeText(WXEntryActivity.this, "服务器异常,请稍后重试", Toast.LENGTH_SHORT).show();
@@ -151,15 +154,16 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
                         try {
                             String str = response;
                             LoginVo loginVo = new Gson().fromJson(str, LoginVo.class);
-                            if (loginVo.getResult().endsWith("0")){
+                            if (loginVo.getResult().endsWith("0")) {
                                 PrefsUtil.putString(WXEntryActivity.this, "userid", loginVo.getUid());
                                 startActivity(new Intent(WXEntryActivity.this, MainActivity.class));
                             }
-                        }catch (Exception e){
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }
                 });
+        ProgressDialog.dismissDialog();
     }
 
 

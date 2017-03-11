@@ -36,6 +36,8 @@ import com.lixin.listen.util.AppHelper;
 import com.lixin.listen.util.DirTraversal;
 import com.lixin.listen.util.GlideCircleTransform;
 import com.lixin.listen.util.PrefsUtil;
+import com.lixin.listen.util.ProgressDialog;
+import com.lixin.listen.util.ToastUtil;
 import com.lixin.listen.util.UpdateManager;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
@@ -95,7 +97,6 @@ public class MeFragment extends BaseFragment implements ServiceFileNumRequest.Se
         ButterKnife.bind(this, view);
         getParams();
         initViews();
-        initData();
         if (TextUtils.isEmpty(PrefsUtil.getString(getActivity(), "first_set_time", ""))) {
             doRequest("30分钟");
         }
@@ -210,7 +211,7 @@ public class MeFragment extends BaseFragment implements ServiceFileNumRequest.Se
     }
 
     private void initData() {
-
+        ProgressDialog.showProgressDialog(getActivity(), "更新信息...");
         String url = Constant.URL + "json=" + new Gson().toJson(new RequestVO("getPersonalInfo", PrefsUtil.getString(getActivity(), "userid", "")));
         OkHttpUtils
                 .get()
@@ -221,14 +222,19 @@ public class MeFragment extends BaseFragment implements ServiceFileNumRequest.Se
                     public void onError(Call call, Exception e, int id) {
                         e.printStackTrace();
                         ShowToast("服务器异常,请稍后重试");
+                        ProgressDialog.dismissDialog();
                     }
 
                     @Override
                     public void onResponse(String response, int id) {
                         MyVO vo = new Gson().fromJson(response, MyVO.class);
-                        updataViews(vo);
+                        if (vo.getResult().equals("0")) {
+                            updataViews(vo);
+                        } else {
+                            ToastUtil.showToast("更新信息失败，" + vo.getResultNote());
+                        }
+                        ProgressDialog.dismissDialog();
                     }
-
                 });
     }
 
@@ -372,6 +378,7 @@ public class MeFragment extends BaseFragment implements ServiceFileNumRequest.Se
 
     @Override
     public void loadData() {
+        initData();
         serviceFileRequest.getServiceFile();
     }
 }

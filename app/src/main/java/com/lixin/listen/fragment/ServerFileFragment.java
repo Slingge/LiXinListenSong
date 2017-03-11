@@ -23,6 +23,7 @@ import com.lixin.listen.R;
 import com.lixin.listen.bean.CommonVO;
 import com.lixin.listen.bean.IPlayCompleted;
 import com.lixin.listen.bean.ISeekbarProgress;
+import com.lixin.listen.bean.MusicBean;
 import com.lixin.listen.bean.MyZhuanjiVo;
 import com.lixin.listen.bean.RequestVO;
 import com.lixin.listen.bean.ZhuanjiQuziVO;
@@ -164,7 +165,6 @@ public class ServerFileFragment extends Fragment {
                 holder.setOnClickListener(R.id.rl_play, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
                         holder.setVisible(R.id.iv_pause, true);
                         holder.setVisible(R.id.iv_play, false);
                         MediaPlayerUtil.getInStance().play(bean.getAlbumVoice(), ((SeekBar) holder.getView(R.id.sb)), new IPlayCompleted() {
@@ -387,9 +387,22 @@ public class ServerFileFragment extends Fragment {
         zhuanjiAdapter.notifyDataSetChanged();
     }
 
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        List<ZhuanjiQuziVO.AlbumListBean> quziList = new ArrayList<>();
+        zhuanjiList.clear();
+        zhuanjiAdapter.notifyDataSetChanged();
+        quziList.clear();
+        quziAdapter.notifyDataSetChanged();
+        MediaPlayerUtil.getInStance().pause();
+    }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         ButterKnife.unbind(this);
     }
+
 }

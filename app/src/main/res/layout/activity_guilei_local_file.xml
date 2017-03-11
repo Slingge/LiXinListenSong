@@ -42,7 +42,9 @@
             android:background="@mipmap/img_input_kuang"
             android:gravity="center_vertical"
             android:hint="请输入曲目名称"
+            android:maxLines="1"
             android:paddingLeft="10dp"
+            android:singleLine="true"
             android:textColor="@color/col3"
             android:textColorHint="@color/col4"
             android:textSize="14sp" />
@@ -103,6 +105,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="40dp"
-        android:background="@mipmap/img_save" />
+        android:background="@drawable/save_btn_click" />
 
 </LinearLayout>

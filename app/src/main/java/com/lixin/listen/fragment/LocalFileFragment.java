@@ -429,6 +429,7 @@ public class LocalFileFragment extends Fragment {
     public void onPause() {
         super.onPause();
         resetStatus();
+        MediaPlayerUtil.getInStance().pause();
     }
 
     @Override
@@ -759,7 +760,7 @@ public class LocalFileFragment extends Fragment {
         ProgressDialog.showProgressDialog(getActivity(), "更新服务器数据...");
         String json = "{\"cmd\":\"updateType\",\"uid\":\"" + PrefsUtil.getString(getActivity(), "userid", "") + "\",\"albumid\":\"" + albumid +
                 "\",\"firstTypeId\":\"" + firstTypeId + "\",\"secondTypeId\":\"" + secondTypeId + "\",\"thirdTypeId\":\"" + thirdTypeId + "\",\"albumName\":\"" + albumName + "\"}";
-        abLog.e("重新归类参数...........", json);
+//        abLog.e("重新归类参数...........", json);
         OkHttpUtils.post().url(Constant.URL).addParams("json", json).build().execute(new StringCallback() {
             @Override
             public void onError(Call call, Exception e, int id) {
@@ -768,11 +769,11 @@ public class LocalFileFragment extends Fragment {
 
             @Override
             public void onResponse(String response, int id) {
-                abLog.e("重新归类结果..............", response);
+//                abLog.e("重新归类结果..............", response);
                 try {
                     JSONObject obj = new JSONObject(response);
                     if (obj.getString("result").equals("0")) {
-                        PrefsUtil.putString(getActivity(),albumName,albumid);
+                        PrefsUtil.putString(getActivity(), albumName, albumid);
                     } else {
                         ToastUtil.showToast(obj.getString("resultNote"));
                     }
@@ -862,4 +863,6 @@ public class LocalFileFragment extends Fragment {
 
         return retStr;
     }
+
+
 }

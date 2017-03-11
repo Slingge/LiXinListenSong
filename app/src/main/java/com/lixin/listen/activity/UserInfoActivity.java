@@ -9,7 +9,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Process;
 import android.provider.MediaStore;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Base64;
@@ -33,6 +35,7 @@ import com.lixin.listen.common.Constant;
 import com.lixin.listen.util.CameraGallaryUtil;
 import com.lixin.listen.util.GlideCircleTransform;
 import com.lixin.listen.util.PrefsUtil;
+import com.lixin.listen.util.ProgressDialog;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
@@ -53,6 +56,7 @@ import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.Call;
 
+import static com.lixin.listen.R.id.btn_commit;
 import static com.lixin.listen.common.Constant.FILE_PATH;
 
 public class UserInfoActivity extends AppCompatActivity {
@@ -83,8 +87,7 @@ public class UserInfoActivity extends AppCompatActivity {
     LinearLayout llDate;
     @Bind(R.id.activity_user_info)
     LinearLayout activityUserInfo;
-    @Bind(R.id.btn_commit)
-    Button btnCommit;
+
 
     Bitmap bitmapImg = null;
 
@@ -106,17 +109,29 @@ public class UserInfoActivity extends AppCompatActivity {
                 finish();
             }
         });
-        Glide.with(UserInfoActivity.this).load(PrefsUtil.getString(UserInfoActivity.this, "avatar", "")).
-                transform(new GlideCircleTransform(UserInfoActivity.this)).into(ivHeader);
+        Glide.with(this).load(PrefsUtil.getString(this, "avatar", "")).
+                transform(new GlideCircleTransform(this)).into(ivHeader);
         etNickname.setText(PrefsUtil.getString(UserInfoActivity.this, "nickname", ""));
+
+        Button btnCommit = (Button) findViewById(btn_commit);
+        btnCommit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (TextUtils.isEmpty(etNickname.getText().toString())) {
+                    Toast.makeText(UserInfoActivity.this, "昵称不能为空", Toast.LENGTH_SHORT).show();
+                    ProgressDialog.dismissDialog();
+                    return;
+                }
+                doCommit();
+            }
+        });
     }
 
     @OnClick(R.id.iv_left)
     public void doLeft() {
-        if (tvSex.getText().equals("男")){
+        if (tvSex.getText().equals("男")) {
             tvSex.setText("女");
-        }
-        else {
+        } else {
             tvSex.setText("男");
         }
 
@@ -124,10 +139,9 @@ public class UserInfoActivity extends AppCompatActivity {
 
     @OnClick(R.id.iv_right)
     public void doRight() {
-        if (tvSex.getText().equals("男")){
+        if (tvSex.getText().equals("男")) {
             tvSex.setText("女");
-        }
-        else {
+        } else {
             tvSex.setText("男");
         }
     }
@@ -172,7 +186,7 @@ public class UserInfoActivity extends AppCompatActivity {
             bitmapImg = bm;
             try {
                 File file = new File(FILE_PATH + "touxiang.jpg");
-                if (file.exists()){
+                if (file.exists()) {
                     file.delete();
                 }
                 saveFile(bitmapImg, "touxiang.jpg");
@@ -189,19 +203,13 @@ public class UserInfoActivity extends AppCompatActivity {
 
     }
 
-    @OnClick(R.id.btn_commit)
     public void doCommit() {
-
-        if (TextUtils.isEmpty(etNickname.getText().toString())) {
-            Toast.makeText(UserInfoActivity.this, "昵称不能为空", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        ProgressDialog.showProgressDialog(this, "正在提交...");
 
         RequestVO vo = new RequestVO();
         vo.setCmd("androidUpdateNickname");
         vo.setUid(PrefsUtil.getString(UserInfoActivity.this, "userid", ""));
         vo.setUserName(etNickname.getText().toString());
-
 
         String url = Constant.URL + "json=" + new Gson().toJson(vo);
 
@@ -219,6 +227,7 @@ public class UserInfoActivity extends AppCompatActivity {
                     @Override
                     public void onError(Call call, Exception e, int id) {
                         Toast.makeText(UserInfoActivity.this, "服务器异常,请稍后重试", Toast.LENGTH_SHORT).show();
+                        ProgressDialog.dismissDialog();
                     }
 
                     @Override
@@ -232,45 +241,16 @@ public class UserInfoActivity extends AppCompatActivity {
                         } else {
                             Toast.makeText(UserInfoActivity.this, "修改失败，请重试", Toast.LENGTH_SHORT).show();
                         }
-
+                        ProgressDialog.dismissDialog();
                     }
                 });
-    }
-
-    public String bitmaptoString(Bitmap bitmap) {
-
-        // 将Bitmap转换成字符串
-
-        String string = null;
-
-        ByteArrayOutputStream bStream = new ByteArrayOutputStream();
-
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, bStream);
-
-        byte[] bytes = bStream.toByteArray();
-
-        string = Base64.encodeToString(bytes, Base64.DEFAULT);
-
-        return string;
 
     }
 
-    public String Bitmap2StrByBase64(Bitmap bit){
-        ByteArrayOutputStream bos=new ByteArrayOutputStream();
-        bit.compress(Bitmap.CompressFormat.JPEG, 40, bos);//参数100表示不压缩
-        byte[] bytes=bos.toByteArray();
-        return Base64.encodeToString(bytes, Base64.DEFAULT);
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        ProgressDialog.dismissDialog();
     }
-
-    public static String encodeBase64File(String path) throws Exception {
-        File file = new File(path);
-
-        FileInputStream in = new FileInputStream(file);
-
-        byte[] buffer = new byte[(int) file.length() + 100];
-        int length = in.read(buffer);
-
-        return Base64.encodeToString(buffer, 0, length,Base64.DEFAULT);
-    }
-
 }

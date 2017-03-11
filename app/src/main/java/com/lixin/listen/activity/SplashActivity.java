@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import com.lixin.listen.R;
 import com.lixin.listen.util.PrefsUtil;
+import com.lixin.listen.util.ProgressDialog;
 import com.tencent.mm.sdk.openapi.SendAuth;
 
 
@@ -60,13 +61,14 @@ public class SplashActivity extends AbsBaseActivity {
 
     @OnClick(R.id.iv_login)
     public void doLogin() {
-
+        ProgressDialog.showProgressDialog(this, "正在跳转...");
         if (!TextUtils.isEmpty(PrefsUtil.getString(SplashActivity.this, "userid", ""))) {
             startActivity(new Intent(SplashActivity.this, MainActivity.class));
         } else {
             if (!api.isWXAppInstalled()) {
                 Toast.makeText(SplashActivity.this, "您还未安装微信客户端",
                         Toast.LENGTH_SHORT).show();
+                ProgressDialog.dismissDialog();
                 return;
             }
             SendAuth.Req req = new SendAuth.Req();
@@ -74,6 +76,12 @@ public class SplashActivity extends AbsBaseActivity {
             req.state = "wechat_sdk_demo_test";
             api.sendReq(req);//执行完毕这句话之后，会在WXEntryActivity回调
         }
+    }
 
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        ProgressDialog.dismissDialog();
     }
 }
