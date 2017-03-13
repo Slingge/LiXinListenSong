@@ -64,6 +64,7 @@ public class MyZhuanjiVo {
         private String albumImg;
         private String albumName;
 
+
         private boolean isSelect;
 
         public boolean isSelect() {

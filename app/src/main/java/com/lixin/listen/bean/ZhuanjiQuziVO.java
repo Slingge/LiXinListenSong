@@ -69,6 +69,16 @@ public class ZhuanjiQuziVO {
         private String commentNum;
         private String praiseCount;
 
+        private boolean isPlay = false;
+
+        public boolean isPlay() {
+            return isPlay;
+        }
+
+        public void setPlay(boolean play) {
+            isPlay = play;
+        }
+
         public String getAlbumId() {
             return albumId;
         }

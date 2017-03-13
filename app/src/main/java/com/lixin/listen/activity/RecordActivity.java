@@ -30,7 +30,9 @@ import com.lixin.listen.util.DateUtil;
 import com.lixin.listen.util.DirTraversal;
 import com.lixin.listen.util.MediaRecorderUtil;
 import com.lixin.listen.util.PrefsUtil;
+import com.lixin.listen.util.ProgressDialog;
 import com.lixin.listen.util.RealPathMediaRecordUtil;
+import com.lixin.listen.util.ToastUtil;
 import com.lixin.listen.view.ClickImageView;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
@@ -50,7 +52,7 @@ import butterknife.OnClick;
 import okhttp3.Call;
 
 
-public class RecordActivity extends AppCompatActivity implements ClickImageView.ClickImageViewCallBack{
+public class RecordActivity extends AppCompatActivity implements ClickImageView.ClickImageViewCallBack {
 
     @Bind(R.id.iv_back)
     ImageView ivBack;
@@ -85,6 +87,8 @@ public class RecordActivity extends AppCompatActivity implements ClickImageView.
 
     private StartRecordVo startRecordVo;
 
+    private File RecordFile;//录音文件
+
     private boolean isSaveFile = true;
 
     //    File extDir = Environment.getExternalStorageDirectory();
@@ -101,6 +105,11 @@ public class RecordActivity extends AppCompatActivity implements ClickImageView.
     // 当天录制文件的总时间长度
     private int AllFileTiem = 0;
 
+    private int l = 0;//录音时间
+    private int startTime;//开始录音的时间
+    private int startFileTime = 0;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -109,7 +118,7 @@ public class RecordActivity extends AppCompatActivity implements ClickImageView.
         BusProvider.getInstance().register(this);
         getParams();
         initViews();
-        btnStop= (ClickImageView) findViewById(R.id.btn_stop);
+        btnStop = (ClickImageView) findViewById(R.id.btn_stop);
         btnStop.setClickImageViewCallBack(this);
         // 开始录音-记录临时文件
         tempMediarecorder();
@@ -153,6 +162,7 @@ public class RecordActivity extends AppCompatActivity implements ClickImageView.
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        l++;
                         try {
                             double ratio = MediaRecorderUtil.recorder.getMaxAmplitude();
                             if (ratio > 1)
@@ -170,7 +180,7 @@ public class RecordActivity extends AppCompatActivity implements ClickImageView.
 
                                 }
                                 noVocieTime = 0;
-
+                                startTime++;
                                 AllFileTiem++;
 
                             } else {
@@ -183,8 +193,8 @@ public class RecordActivity extends AppCompatActivity implements ClickImageView.
                                 if (RealPathMediaRecordUtil.realRecord != null) {
                                     RealPathMediaRecordUtil.stopRecordering();
                                     noVocieTime = 0;
-                                    AllFileTiem += 3;
-                                    MediaRecorderUtil.startRecordering(filePath);
+//                                    AllFileTiem += 3;
+//                                    MediaRecorderUtil.startRecordering(filePath);
                                     Log.e("RecordAcitivy", "开始录制临时文件");
 
                                 }
@@ -221,6 +231,7 @@ public class RecordActivity extends AppCompatActivity implements ClickImageView.
 //                                    Log.e("RecordAcitivy", "录制真实文件");
                                 }
                                 noVocieTime = 0;
+                                startTime++;
                                 AllFileTiem++;
 
                             } else {
@@ -233,7 +244,7 @@ public class RecordActivity extends AppCompatActivity implements ClickImageView.
                                 if (RealPathMediaRecordUtil.realRecord != null) {
                                     RealPathMediaRecordUtil.stopRecordering();
                                     noVocieTime = 0;
-                                    AllFileTiem += 3;
+//                                    AllFileTiem += 3;
                                     MediaRecorderUtil.startRecordering(filePath);
                                     Log.e("RecordAcitivy", "开始录制临时文件");
                                 }
@@ -294,7 +305,6 @@ public class RecordActivity extends AppCompatActivity implements ClickImageView.
     }
 
 
-
     long sencondTem = 0;
 
     // 时间：分秒
@@ -315,7 +325,6 @@ public class RecordActivity extends AppCompatActivity implements ClickImageView.
         } else {
             result = 0;
         }
-
         return result;
     }
 
@@ -361,7 +370,7 @@ public class RecordActivity extends AppCompatActivity implements ClickImageView.
         } else {
             AllFileTiem = 0;
         }
-
+        startFileTime = AllFileTiem;
     }
 
     private void initViews() {
@@ -413,17 +422,30 @@ public class RecordActivity extends AppCompatActivity implements ClickImageView.
     }
 
     private void doFinishRecord() {
+        ProgressDialog.showProgressDialog(this, "正在保存文件...");
 
-        AllFileTiem = AllFileTiem - 1;
         mTimer.cancel();
+        if (l < 6) {//录制时间小于6s，不保存
+            ToastUtil.showToast("录音时间不足6秒，已被舍弃");
+            ProgressDialog.dismissDialog();
+            finish();
+            return;
+        }
         RequestVO vo = new RequestVO();
         vo.setCmd("endRecording");
         vo.setUid(PrefsUtil.getString(RecordActivity.this, "userid", ""));
-        int time = Integer.valueOf(String.valueOf(sencondTem));
+
+        int time;
+        if (l > startTime) {
+            time = Integer.valueOf(l + startFileTime);
+        } else {
+            time = Integer.valueOf(startTime + startFileTime + 2);
+        }
+
         String time1 = time / 60 + "分" + time % 60 + "秒";
         // 录制时长
-        vo.setRecTimeLength(time1);
         // 文件时长-
+        vo.setRecTimeLength(time1);
         String fileTime = AllFileTiem / 60 + "分" + AllFileTiem % 60 + "秒";
 
         vo.setFileTimeLength(getTodayFileTime());
@@ -437,31 +459,30 @@ public class RecordActivity extends AppCompatActivity implements ClickImageView.
                     @Override
                     public void onError(Call call, Exception e, int id) {
                         e.printStackTrace();
+                        ToastUtil.showToast("网络错误，保存失败");
+                        ProgressDialog.dismissDialog();
                     }
 
                     @Override
                     public void onResponse(String response, int id) {
                         RecordSuccessVO vo = new Gson().fromJson(response, RecordSuccessVO.class);
                         if (vo.getResult().equals("0")) {
-
+                            ProgressDialog.dismissDialog();
                             BusProvider.getInstance().post(new RefreshEvent());
-
                             finish();
+                        } else {
+                            Toast.makeText(RecordActivity.this, vo.getResultNote(), Toast.LENGTH_SHORT).show();
                         }
-
-                        Toast.makeText(RecordActivity.this, vo.getResultNote(), Toast.LENGTH_SHORT).show();
-
-
                     }
-
                 });
     }
 
     /**
      * 获取文件录制总时间
+     *
      * @return
      */
-    private String getTodayFileTime(){
+    private String getTodayFileTime() {
         String result = "";
 
         SimpleDateFormat sf = new SimpleDateFormat("MM-dd");
@@ -480,7 +501,7 @@ public class RecordActivity extends AppCompatActivity implements ClickImageView.
             return "";
         for (int i = 0; i < files.size(); i++) {
             File file = files.get(i);
-            if (file.getName().contains(todayTime)){
+            if (file.getName().contains(todayTime)) {
                 tempFileList.add(file);
             }
         }
@@ -492,10 +513,10 @@ public class RecordActivity extends AppCompatActivity implements ClickImageView.
         }
 
         Log.e("RecordAcitivy", "文件总时间:" + fileTimeAll);
-        Log.e("RecordAcitivy", "文件总时间格式化:" + getTimeFormat(fileTimeAll/1000));
+        Log.e("RecordAcitivy", "文件总时间格式化:" + getTimeFormat(fileTimeAll / 1000));
 
 
-        return getTimeFormat(fileTimeAll/1000);
+        return getTimeFormat(fileTimeAll / 1000);
     }
 
     /**
@@ -552,7 +573,7 @@ public class RecordActivity extends AppCompatActivity implements ClickImageView.
             });
             builder.create().show();
             return false;
-        }else {
+        } else {
             return super.onKeyDown(keyCode, event);
         }
 
@@ -588,7 +609,6 @@ public class RecordActivity extends AppCompatActivity implements ClickImageView.
             }
 
             mp.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-
                 @Override
                 public void onPrepared(MediaPlayer mp) {
                     int size = mp.getDuration();
@@ -599,7 +619,6 @@ public class RecordActivity extends AppCompatActivity implements ClickImageView.
                 }
             });
         }
-
         doFinishRecord();
     }
 }

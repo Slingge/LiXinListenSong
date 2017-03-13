@@ -12,6 +12,7 @@ import android.widget.Toast;
 import com.lixin.listen.R;
 import com.lixin.listen.util.PrefsUtil;
 import com.lixin.listen.util.ProgressDialog;
+import com.lixin.listen.util.ToastUtil;
 import com.tencent.mm.sdk.openapi.SendAuth;
 
 
@@ -61,6 +62,7 @@ public class SplashActivity extends AbsBaseActivity {
 
     @OnClick(R.id.iv_login)
     public void doLogin() {
+        ToastUtil.showToast("跳转微信登录...");
         ProgressDialog.showProgressDialog(this, "正在跳转...");
         if (!TextUtils.isEmpty(PrefsUtil.getString(SplashActivity.this, "userid", ""))) {
             startActivity(new Intent(SplashActivity.this, MainActivity.class));

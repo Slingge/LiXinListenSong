@@ -158,7 +158,6 @@ public class ServerFileFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         showDeleteDialog(bean, holder);
-
                     }
                 });
 
@@ -183,6 +182,7 @@ public class ServerFileFragment extends Fragment {
                     }
                 });
 
+
                 // 暂停
                 holder.setOnClickListener(R.id.iv_pause, new View.OnClickListener() {
                     @Override
@@ -195,7 +195,6 @@ public class ServerFileFragment extends Fragment {
             }
         };
         rvZhuanjiQuzi.setAdapter(quziAdapter);
-
     }
 
     public String ShowTime(int time) {
@@ -391,13 +390,18 @@ public class ServerFileFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        List<ZhuanjiQuziVO.AlbumListBean> quziList = new ArrayList<>();
-        zhuanjiList.clear();
-        zhuanjiAdapter.notifyDataSetChanged();
-        quziList.clear();
-        quziAdapter.notifyDataSetChanged();
+        resetStatus();
         MediaPlayerUtil.getInStance().pause();
     }
+
+
+    private void resetStatus() {
+        for (ZhuanjiQuziVO.AlbumListBean bean : quziAdapter.getDatas()) {
+            bean.setPlay(false);
+        }
+        quziAdapter.notifyDataSetChanged();
+    }
+
 
     @Override
     public void onDestroyView() {

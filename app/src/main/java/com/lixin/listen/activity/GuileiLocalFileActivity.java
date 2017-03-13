@@ -26,6 +26,7 @@ import com.lixin.listen.common.Constant;
 import com.lixin.listen.util.MaxLengthWatcher;
 import com.lixin.listen.util.MediaPlayerUtil;
 import com.lixin.listen.util.PrefsUtil;
+import com.lixin.listen.util.ProgressDialog;
 import com.lixin.listen.util.ToastUtil;
 import com.lixin.listen.view.ClickButton;
 import com.lixin.listen.view.ClickImageView;
@@ -42,7 +43,7 @@ import static com.lixin.listen.R.id.iv_tuijianzhuanji;
 /**
  * 归类本地文件
  */
-public class GuileiLocalFileActivity extends AppCompatActivity implements ClickImageViewCallBack, ClickButton.ClickButtonCallBack {
+public class GuileiLocalFileActivity extends AppCompatActivity implements ClickImageViewCallBack {
 
     @Bind(R.id.iv_back)
     ImageView ivBack;
@@ -97,7 +98,7 @@ public class GuileiLocalFileActivity extends AppCompatActivity implements ClickI
     private String thirdTypeId = "";
 
     ClickImageView ivTuijianzhuanji;
-    ClickButton btnSave;
+    Button btnSave;
 
     // 专辑名称
     String zhuanjiName;
@@ -113,9 +114,13 @@ public class GuileiLocalFileActivity extends AppCompatActivity implements ClickI
         initViews();
         ivTuijianzhuanji = (ClickImageView) findViewById(R.id.iv_tuijianzhuanji);
         ivTuijianzhuanji.setClickImageViewCallBack(this);
-        btnSave = (ClickButton) findViewById(R.id.btn_save);
-        btnSave.setClickButtonCallBack(this);
-
+        btnSave = (Button) findViewById(R.id.btn_save);
+        btnSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                clickButton();
+            }
+        });
     }
 
     private void getParams() {
@@ -236,7 +241,6 @@ public class GuileiLocalFileActivity extends AppCompatActivity implements ClickI
         startActivityForResult(intent, 1001);
     }
 
-    @Override
     public void clickButton() {
         if (TextUtils.isEmpty(etName.getText().toString())) {
             Toast.makeText(this, "请先填写曲子的名称", Toast.LENGTH_SHORT).show();
@@ -246,7 +250,7 @@ public class GuileiLocalFileActivity extends AppCompatActivity implements ClickI
             Toast.makeText(this, "请先选择专辑", Toast.LENGTH_SHORT).show();
             return;
         }
-
+        ProgressDialog.showProgressDialog(this, "正在修改...");
         File file = new File(musicBean.getFilePath());
         String filePath = musicBean.getFilePath();
         // 未归类文件
@@ -280,7 +284,7 @@ public class GuileiLocalFileActivity extends AppCompatActivity implements ClickI
                     PrefsUtil.putString(GuileiLocalFileActivity.this, Constant.FIRST_ROOT, firstTypeId);
                 } else {
                     String firstRoot = PrefsUtil.getString(GuileiLocalFileActivity.this, Constant.FIRST_ROOT, "");
-                    PrefsUtil.putString(GuileiLocalFileActivity.this, Constant.FIRST_ROOT, firstTypeId + "," +firstRoot);
+                    PrefsUtil.putString(GuileiLocalFileActivity.this, Constant.FIRST_ROOT, firstTypeId + "," + firstRoot);
                 }
                 // 保存二级目录
                 if (TextUtils.isEmpty(PrefsUtil.getString(GuileiLocalFileActivity.this, Constant.SECOND_ROOT, ""))) {
@@ -297,6 +301,7 @@ public class GuileiLocalFileActivity extends AppCompatActivity implements ClickI
                     PrefsUtil.putString(GuileiLocalFileActivity.this, Constant.THIRD_ROOT, thirdTypeId + "," + thirdRoot);
                 }
                 setResult(RESULT_OK, intent);
+                ProgressDialog.dismissDialog();
                 finish();
             }
         }, 1000);

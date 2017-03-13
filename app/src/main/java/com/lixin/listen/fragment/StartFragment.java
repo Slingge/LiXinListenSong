@@ -70,6 +70,7 @@ public class StartFragment extends Fragment implements ClickImageView.ClickImage
                     public void onError(Call call, Exception e, int id) {
                         e.printStackTrace();
                         Toast.makeText(getActivity(), "服务器异常,请稍后重试", Toast.LENGTH_SHORT).show();
+                        ProgressDialog.dismissDialog();
                     }
 
                     @Override
@@ -91,9 +92,10 @@ public class StartFragment extends Fragment implements ClickImageView.ClickImage
                             ProgressDialog.dismissDialog();
                             ToastUtil.showToast(vo.getResultNote());
                         }
+                        ProgressDialog.dismissDialog();
                     }
                 });
-        ProgressDialog.dismissDialog();
+
     }
 
 
