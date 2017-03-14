@@ -66,6 +66,7 @@ public class SplashActivity extends AbsBaseActivity {
         ProgressDialog.showProgressDialog(this, "正在跳转...");
         if (!TextUtils.isEmpty(PrefsUtil.getString(SplashActivity.this, "userid", ""))) {
             startActivity(new Intent(SplashActivity.this, MainActivity.class));
+            ProgressDialog.dismissDialog();
         } else {
             if (!api.isWXAppInstalled()) {
                 Toast.makeText(SplashActivity.this, "您还未安装微信客户端",

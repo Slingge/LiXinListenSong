@@ -23,6 +23,7 @@ import com.lixin.listen.bean.ISeekbarProgress;
 import com.lixin.listen.bean.MusicBean;
 import com.lixin.listen.bean.ThirdTypeVO;
 import com.lixin.listen.common.Constant;
+import com.lixin.listen.httpRequest.GetZhuanJiIdRequset;
 import com.lixin.listen.util.MaxLengthWatcher;
 import com.lixin.listen.util.MediaPlayerUtil;
 import com.lixin.listen.util.PrefsUtil;
@@ -105,6 +106,8 @@ public class GuileiLocalFileActivity extends AppCompatActivity implements ClickI
     // 曲子名称
     String quziName;
 
+    private GetZhuanJiIdRequset zhuanJiIdRequset;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,6 +115,7 @@ public class GuileiLocalFileActivity extends AppCompatActivity implements ClickI
         ButterKnife.bind(this);
         getParams();
         initViews();
+        onStart1();
         ivTuijianzhuanji = (ClickImageView) findViewById(R.id.iv_tuijianzhuanji);
         ivTuijianzhuanji.setClickImageViewCallBack(this);
         btnSave = (Button) findViewById(R.id.btn_save);
@@ -121,6 +125,29 @@ public class GuileiLocalFileActivity extends AppCompatActivity implements ClickI
                 clickButton();
             }
         });
+    }
+
+
+    protected void onStart1() {
+        String musicId = getIntent().getStringExtra("musicId");
+        zhuanJiIdRequset = new GetZhuanJiIdRequset(this);
+        zhuanJiIdRequset.setZhuanJiIdCallBack(new GetZhuanJiIdRequset.ZhuanJiIdCallBack() {
+            @Override
+            public void ZhuanJiId(String firstTypeId, String secondTypeId, String thirdTypeId) {
+                if (firstTypeId.equals("") | secondTypeId.equals("") | thirdTypeId.equals("")) {
+                    tvZhuanji.setText("");
+                } else {
+                    GuileiLocalFileActivity.this.firstTypeId = firstTypeId;
+                    GuileiLocalFileActivity.this.secondTypeId = secondTypeId;
+                    GuileiLocalFileActivity.this.thirdTypeId = thirdTypeId;
+                }
+            }
+        });
+        if (!TextUtils.isEmpty(musicId)) {
+            zhuanJiIdRequset.ZhuanJiId(musicId);
+        } else {
+            tvZhuanji.setText("");
+        }
     }
 
     private void getParams() {
@@ -146,7 +173,7 @@ public class GuileiLocalFileActivity extends AppCompatActivity implements ClickI
             quziName = musicBean.getMusicName().substring(musicBean.getMusicName().indexOf("#") + 1,
                     musicBean.getMusicName().indexOf("%"));
             etName.setText(quziName);
-//            tvZhuanji.setText(zhuanjiName);
+            tvZhuanji.setText(zhuanjiName);
             tvZhuanjiIcon.setText(zhuanjiName);
             tvZhuanjiIcon.setVisibility(View.VISIBLE);
             tvName.setText(quziName);
